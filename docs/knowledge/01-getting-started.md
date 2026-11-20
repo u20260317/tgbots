@@ -4,6 +4,20 @@
 
 Bot 到底是什么、怎么出生、token 是什么东西、一条消息从用户手机到你的代码再回去的完整旅程。读完这篇，你脑子里应该有一张不会错的地图，后面所有篇都是在这张地图上放大细节。
 
+先看全景——从零到上线一共六步：
+
+```mermaid
+flowchart TD
+    A[在 BotFather 注册 Bot] --> B[保存 Token 到 Secret]
+    B --> C[写 worker 代码]
+    C --> D[部署到 Cloudflare Worker]
+    D --> E[注册 Webhook 回调]
+    E --> F{自检通过}
+    F -->|是| G[私聊 Bot 发 start 验证]
+    F -->|否| H[查 Webhook 状态排障]
+    H --> E
+```
+
 ## 核心概念
 
 ### Bot 不是账号，是 API 身份
