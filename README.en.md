@@ -30,7 +30,7 @@
 ## ✨ Highlights
 
 - 📄 **Truly single-file**: one bot = one `worker.js`, no build, no dependencies, drop it into a Worker and it runs
-- 🧪 **Fully tested**: all 54 deployables verified live one by one; test records are public in [docs/TESTING.md](docs/TESTING.md)
+- 🧪 **Fully tested**: all 85 deployables verified live one by one; test records are public in [docs/TESTING.md](docs/TESTING.md)
 - 🧩 **Building-block modules**: core modules are banner-commented (`【核心模块】`) and documented in the [module library](modules/README.md), ready to lift out and reuse
 - 🎛️ **Tiered command menus**: admin commands only appear in admins' menus (whitelist + scoped registration); regular users never see them
 - 🔐 **Secure by default**: tokens only in Secrets, signed webhooks, admins whitelisted by numeric ID
