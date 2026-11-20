@@ -13,54 +13,119 @@
 // 部署后访问 https://你的Worker地址/setWebhook?key=你的WEBHOOK_SECRET
 // ============================================================
 
-const admins = (env) => String(env.ADMIN_ID || "").split(",").map((s) => s.trim()).filter(Boolean);
+const admins = (env) =>
+  String(env.ADMIN_ID || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 // ============================================================
 // 【核心模块】Telegram Bot API 通信层
 // 统一封装 tg()：所有给 Telegram 发的请求都走这里，改 API 地址/加重试只改这一处。
 // ============================================================
 async function tg(env, method, payload) {
-  const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
-    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
-  });
+  const r = await fetch(
+    `https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    },
+  );
   return r.json().catch(() => ({}));
 }
-const send = (env, chat_id, text, extra = {}) => tg(env, "sendMessage", { chat_id, text, ...extra });
-const code = () => Array.from(crypto.getRandomValues(new Uint8Array(6))).map((b) => "abcdefghjkmnpqrstuvwxyz23456789"[b % 31]).join("");
+const send = (env, chat_id, text, extra = {}) =>
+  tg(env, "sendMessage", { chat_id, text, ...extra });
+const code = () =>
+  Array.from(crypto.getRandomValues(new Uint8Array(6)))
+    .map((b) => "abcdefghjkmnpqrstuvwxyz23456789"[b % 31])
+    .join("");
 
 // ============================================================
 // 【核心模块】文件类型识别
 // 从消息里提取文件类型与 file_id，存文件和按类型回发都靠它。
 // ============================================================
 function fileOf(msg) {
-  if (msg.document) return { kind: "document", id: msg.document.file_id, name: msg.document.file_name || "文件" };
-  if (msg.photo?.length) return { kind: "photo", id: msg.photo[msg.photo.length - 1].file_id, name: "图片" };
-  if (msg.video) return { kind: "video", id: msg.video.file_id, name: msg.video.file_name || "视频" };
-  if (msg.audio) return { kind: "audio", id: msg.audio.file_id, name: msg.audio.file_name || "音频" };
+  if (msg.document)
+    return {
+      kind: "document",
+      id: msg.document.file_id,
+      name: msg.document.file_name || "文件",
+    };
+  if (msg.photo?.length)
+    return {
+      kind: "photo",
+      id: msg.photo[msg.photo.length - 1].file_id,
+      name: "图片",
+    };
+  if (msg.video)
+    return {
+      kind: "video",
+      id: msg.video.file_id,
+      name: msg.video.file_name || "视频",
+    };
+  if (msg.audio)
+    return {
+      kind: "audio",
+      id: msg.audio.file_id,
+      name: msg.audio.file_name || "音频",
+    };
   if (msg.voice) return { kind: "voice", id: msg.voice.file_id, name: "语音" };
-  if (msg.animation) return { kind: "animation", id: msg.animation.file_id, name: "动图" };
+  if (msg.animation)
+    return { kind: "animation", id: msg.animation.file_id, name: "动图" };
   return null;
 }
 const sendByKind = (env, chat_id, f, caption) =>
-  tg(env, { document: "sendDocument", photo: "sendPhoto", video: "sendVideo", audio: "sendAudio", voice: "sendVoice", animation: "sendAnimation" }[f.kind] || "sendDocument",
-    { chat_id, [f.kind]: f.id, caption: caption || undefined });
+  tg(
+    env,
+    {
+      document: "sendDocument",
+      photo: "sendPhoto",
+      video: "sendVideo",
+      audio: "sendAudio",
+      voice: "sendVoice",
+      animation: "sendAnimation",
+    }[f.kind] || "sendDocument",
+    { chat_id, [f.kind]: f.id, caption: caption || undefined },
+  );
 
 // ============================================================
 // 【核心模块】Worker 入口与路由
 // 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
 // ============================================================
+// ---------- Bot 命令菜单（部署时 /setWebhook 自动注册到输入框菜单） ----------
+const COMMANDS = [{ command: "start", description: "开始使用 / 取文件" }];
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    if (!env.BOT_TOKEN) return new Response("BOT_TOKEN 未配置", { status: 500 });
-    if (url.pathname === "/") return new Response("file-store bot is running.", { headers: { "content-type": "text/plain;charset=utf-8" } });
+    if (!env.BOT_TOKEN)
+      return new Response("BOT_TOKEN 未配置", { status: 500 });
+    if (url.pathname === "/")
+      return new Response("file-store bot is running.", {
+        headers: { "content-type": "text/plain;charset=utf-8" },
+      });
     if (url.pathname === "/setWebhook") {
-      if (!env.WEBHOOK_SECRET || url.searchParams.get("key") !== env.WEBHOOK_SECRET) return new Response("forbidden", { status: 403 });
+      if (
+        !env.WEBHOOK_SECRET ||
+        url.searchParams.get("key") !== env.WEBHOOK_SECRET
+      )
+        return new Response("forbidden", { status: 403 });
       const hook = `${url.origin}/webhook`;
-      const r = await tg(env, "setWebhook", { url: hook, secret_token: env.WEBHOOK_SECRET, allowed_updates: ["message"] });
-      return Response.json({ setWebhook: hook, telegram: r });
+      const r = await tg(env, "setWebhook", {
+        url: hook,
+        secret_token: env.WEBHOOK_SECRET,
+        allowed_updates: ["message"],
+      });
+      const cm = await tg(env, "setMyCommands", { commands: COMMANDS });
+      return Response.json({ setWebhook: hook, telegram: r, commands: cm });
     }
-    if (url.pathname !== "/webhook" || request.method !== "POST") return new Response("not found", { status: 404 });
-    if (env.WEBHOOK_SECRET && request.headers.get("x-telegram-bot-api-secret-token") !== env.WEBHOOK_SECRET)
+    if (url.pathname !== "/webhook" || request.method !== "POST")
+      return new Response("not found", { status: 404 });
+    if (
+      env.WEBHOOK_SECRET &&
+      request.headers.get("x-telegram-bot-api-secret-token") !==
+        env.WEBHOOK_SECRET
+    )
       return new Response("forbidden", { status: 403 });
     const update = await request.json().catch(() => ({}));
     ctx.waitUntil(handle(env, update));
@@ -75,7 +140,12 @@ export default {
 async function handle(env, update) {
   const msg = update.message;
   if (!msg || msg.chat.type !== "private") return;
-  if (!env.BOT_KV) return send(env, msg.chat.id, "⚠️ 本 Bot 需要先绑定 KV（变量名 BOT_KV），管理员还没配置好。");
+  if (!env.BOT_KV)
+    return send(
+      env,
+      msg.chat.id,
+      "⚠️ 本 Bot 需要先绑定 KV（变量名 BOT_KV），管理员还没配置好。",
+    );
   const text = msg.text || "";
 
   // 取文件：/start f_xxxxxx
@@ -88,18 +158,34 @@ async function handle(env, update) {
     return send(env, msg.chat.id, "✅ 就是上面这个文件，保存好哦。");
   }
   if (text.startsWith("/start"))
-    return send(env, msg.chat.id, admins(env).includes(String(msg.from.id))
-      ? "📦 文件分享 Bot（管理员）：直接把文件/图片/视频发给我，我回你一个专属分享链接，别人点链接就能找我领取该文件。"
-      : "📦 你好，我是文件领取 Bot。请通过管理员分享的专属链接打开我来领取文件。");
+    return send(
+      env,
+      msg.chat.id,
+      admins(env).includes(String(msg.from.id))
+        ? "📦 文件分享 Bot（管理员）：直接把文件/图片/视频发给我，我回你一个专属分享链接，别人点链接就能找我领取该文件。"
+        : "📦 你好，我是文件领取 Bot。请通过管理员分享的专属链接打开我来领取文件。",
+    );
 
   // 管理员存文件
   const f = fileOf(msg);
   if (f) {
-    if (!admins(env).includes(String(msg.from.id))) return send(env, msg.chat.id, "⛔ 只有管理员能存文件。");
+    if (!admins(env).includes(String(msg.from.id)))
+      return send(env, msg.chat.id, "⛔ 只有管理员能存文件。");
     const c = code();
-    await env.BOT_KV.put("f:" + c, JSON.stringify({ ...f, caption: msg.caption || "" }));
+    await env.BOT_KV.put(
+      "f:" + c,
+      JSON.stringify({ ...f, caption: msg.caption || "" }),
+    );
     const link = `https://t.me/${env.BOT_USERNAME}?start=f_${c}`;
-    return send(env, msg.chat.id, `✅ 已保存「${f.name}」\n\n🔗 分享链接：\n${link}\n\n任何人点开链接即可向我领取该文件。删除分享：在 KV 里删除键 f:${c}`);
+    return send(
+      env,
+      msg.chat.id,
+      `✅ 已保存「${f.name}」\n\n🔗 分享链接：\n${link}\n\n任何人点开链接即可向我领取该文件。删除分享：在 KV 里删除键 f:${c}`,
+    );
   }
-  return send(env, msg.chat.id, "把文件发给我（管理员），或通过分享链接打开我领取文件。");
+  return send(
+    env,
+    msg.chat.id,
+    "把文件发给我（管理员），或通过分享链接打开我领取文件。",
+  );
 }
