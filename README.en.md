@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/github/license/u20260317/tgbots?style=flat-square)](LICENSE)
 ![Language](https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square)
 
-**30 everyday Telegram bots, each a single standalone `worker.js` file**: copy-paste into a Cloudflare Worker and deploy — zero dependencies, zero servers, runs on the Workers free tier. Plus **24 module docs** that break common capabilities into building blocks you can assemble into your own bot.
+**30 everyday Telegram bots, each a single standalone `worker.js` file**: copy-paste into a Cloudflare Worker and deploy — zero dependencies, zero servers, runs on the Workers free tier. Plus **34 module docs** that break common capabilities into building blocks you can assemble into your own bot.
 
 ## ✨ Highlights
 
@@ -73,7 +73,7 @@ Every directory has its own `README.md` (variable list + gotchas).
 
 ## 🧩 Module Library
 
-Common capabilities are broken into 24 standalone module docs (principles + copy-paste real code + integration steps + caveats): foundation, admin whitelist & tiered menus, buttons & callbacks, KV storage, channel posting, force-subscribe checks, forward routing, file storage, Cron, review flow, group management, join-request review, payment & delivery, referral attribution, RSS, check-in & lottery, config-driven menus, quiz sessions, external APIs, FSM state machine, mother-bot multi-tenancy, shop catalog & cart, franchise malls, Stars payments. Start here when building your own: [modules/README.md](modules/README.md).
+Common capabilities are broken into 34 standalone module docs (principles + copy-paste real code + integration steps + caveats): foundation, admin whitelist & tiered menus, buttons & callbacks, KV storage, channel posting, force-subscribe checks, forward routing, file storage, Cron, review flow, group management, join-request review, payment & delivery, referral attribution, RSS, check-in & lottery, config-driven menus, quiz sessions, external APIs, FSM state machine, mother-bot multi-tenancy, shop catalog & cart, franchise malls, Stars payments, AI chat, inline mode, rate limiting & retries, Mini Apps, i18n, speech-to-text, advanced translation, video downloading, advanced group guarding, personal reminders. Start here when building your own: [modules/README.md](modules/README.md).
 
 ## Code Conventions (building blocks)
 
