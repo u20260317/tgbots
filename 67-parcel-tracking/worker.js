@@ -108,9 +108,12 @@ async function pollParcels(env) {
   if (!env.TRACK17_API_KEY) return; // 未配 Key：不启用追踪（命令侧已说明）
   const list = await env.BOT_KV.list({ prefix: "parcel:", limit: 1000 });
   const byNum = new Map(); // num -> [{uid, rec}]
+  const lists = new Map(); // uid -> 记录数组（与 byNum 里的 rec 同引用，回写必须用它）
   for (const k of list.keys) {
     const uid = k.name.slice(7);
-    for (const rec of await getParcels(env, uid)) {
+    const recs = await getParcels(env, uid);
+    lists.set(uid, recs);
+    for (const rec of recs) {
       if (!byNum.has(rec.num)) byNum.set(rec.num, []);
       byNum.get(rec.num).push({ uid, rec });
     }
@@ -140,7 +143,9 @@ async function pollParcels(env) {
     }
   }
   for (const uid of dirty) {
-    const kept = (await getParcels(env, uid)).filter((r) => !r.done);
+    // 回写内存里已更新 sig/status 的那份列表，不能重读 KV——重读会把
+    // 刚更新的签名覆盖回去，导致每轮重复推送、签收也不停追。
+    const kept = (lists.get(uid) || []).filter((r) => !r.done);
     await saveParcels(env, uid, kept);
   }
 }
