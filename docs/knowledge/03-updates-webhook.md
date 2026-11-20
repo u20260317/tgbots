@@ -57,5 +57,5 @@
 ## 在本库里看哪里落地
 
 - Webhook 注册与验签的完整实现：[modules/01 基础骨架](../../modules/01-foundation.md)（/setWebhook 路由 + 逐条验签）。
-- 特殊更新类型的实战：模板 12（chat_join_request）、模板 16/22（chat_member）、模块 26（inline_query）。
+- 特殊更新类型的实战：模板 12（chat_join_request）、模板 16/22（chat_member）、模块 26（inline_query）、模板 53（business_connection / business_message）、模板 54（ManagedBotUpdated）。
 - 排障时先看：[11 调试与运维](11-debug-ops.md) 的故障表。
