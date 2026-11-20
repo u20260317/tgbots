@@ -54,6 +54,6 @@ Bot 不说话了、按钮死了、消息重复了——怎么系统地查而不�
 
 ## 在本库里看哪里落地
 
-- 测试方法论与全量记录：[docs/TESTING.md](../TESTING.md)。
+- 测试方法论与全量记录：[docs/TESTING.md](../TESTING.md)；方法论专文见 [16 Bot 测试方法论](16-testing-bots.md)（三板斧、L1–L5 分级、边缘抖动识别）。
 - 部署与自检流程：[docs/DEPLOY.md](../DEPLOY.md)；入口健康检查在 [modules/01 基础骨架](../../modules/01-foundation.md)。
 - 告警推送：模板 20（push-api）+ [modules/19 外部 API 与提醒](../../modules/19-external-api.md) 的监控思路。
