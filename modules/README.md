@@ -38,6 +38,14 @@
 | 22 | [商店目录与购物车](22-shop.md) | 分类目录、商品卡、购物车、结账衔接 | 新模式（专项 B） |
 | 23 | [商城连锁](23-franchise-mall.md) | 母体×商店的加盟模式：总部/连锁店划分与熔断 | 新模式（专项 C） |
 | 24 | [Stars 官方支付](24-stars-payment.md) | sendInvoice→复核→到账发货→退款，数字商品合规通道 | 新模式（官方支付） |
+| 35 | [狼人杀主持人](35-werewolf.md) | 角色私发、夜晚行动收集、白天公投的阶段状态机 | 18 进阶（多角色版） |
+| 36 | [贴纸制作](36-stickers.md) | 贴纸规格、建包/加贴纸 API、QuotLy 式引用贴纸 | 新增扩展 |
+| 37 | [图片处理/OCR](37-image-tools.md) | 外部 OCR 提字、代理改尺寸/转格式、渲染引用图 | 新增扩展 |
+| 38 | [原生 Poll/Quiz 与消息反应](38-native-poll-reaction.md) | sendPoll quiz 模式、poll_answer 记分、setMessageReaction 点赞 | 03 / 19 原生替代 |
+| 39 | [论坛话题管理](39-forum-topics.md) | createForumTopic 等方法组、工单按话题组织 | 30 组织升级 |
+| 40 | [URL 上传转存](40-url-upload.md) | 外网链接拉取转存 TG：双路线分流、SSRF 与大小护栏 | 08 外部版 |
+| 41 | [通知适配器](41-notify-adapters.md) | GitHub webhook 验签格式化、存活监控 dead man's switch | 20 专用适配 |
+| 42 | [付费媒体](42-paid-media.md) | sendPaidMedia 卖图/视频、与 Stars 到账联动、已购复看 | 24 媒体形态 |
 
 ## 怎么用
 
