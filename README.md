@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/github/license/u20260317/tgbots?style=flat-square)](LICENSE)
 ![Language](https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square)
 
-**30 个常用 Telegram Bot，每个都是一个独立的 `worker.js` 单文件**：复制粘贴到 Cloudflare Worker 即可部署——零依赖、零服务器、跑在 Workers 免费额度里。另有 **24 篇模块文档**把常用能力拆成积木，照着拼就能组出自己的 Bot。
+**30 个常用 Telegram Bot，每个都是一个独立的 `worker.js` 单文件**：复制粘贴到 Cloudflare Worker 即可部署——零依赖、零服务器、跑在 Workers 免费额度里。另有 **34 篇模块文档**把常用能力拆成积木，照着拼就能组出自己的 Bot。
 
 ## ✨ 特色
 
@@ -73,7 +73,7 @@
 
 ## 🧩 模块库
 
-常用能力已拆成 24 篇独立模块文档（原理 + 可复制的真实代码 + 接入步骤 + 注意点）：基础骨架、管理员白名单与分级菜单、按钮与回调、KV 存储、频道发帖、强制订阅、转发路由、文件存储、Cron、审核流、群管理、入群审核、支付发货、邀请归因、RSS、签到抽奖、配置菜单、竞答会话、外部 API、状态机 FSM、母体多租户、商店购物车、商城连锁、Stars 支付。写新 Bot 先来挑积木：[modules/README.md](modules/README.md)。
+常用能力已拆成 34 篇独立模块文档（原理 + 可复制的真实代码 + 接入步骤 + 注意点）：基础骨架、管理员白名单与分级菜单、按钮与回调、KV 存储、频道发帖、强制订阅、转发路由、文件存储、Cron、审核流、群管理、入群审核、支付发货、邀请归因、RSS、签到抽奖、配置菜单、竞答会话、外部 API、状态机 FSM、母体多租户、商店购物车、商城连锁、Stars 支付、AI 对话、Inline 模式、限流重试、Mini App、多语言、语音转文字、翻译进阶、视频下载、群管进阶、个人提醒。写新 Bot 先来挑积木：[modules/README.md](modules/README.md)。
 
 ## 代码规范（积木式模块）
 
