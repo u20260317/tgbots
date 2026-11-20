@@ -20,6 +20,8 @@
 <a href="#-шаблоны">📚 Шаблоны</a> ·
 <a href="modules/README.md">🧩 Модули</a> ·
 <a href="docs/knowledge/README.md">📖 База знаний</a> ·
+<a href="docs/README.md">🗺️ Карта документации</a> ·
+<a href="docs/COOKBOOK.md">🍳 Рецепты</a> ·
 <a href="docs/DEPLOY.md">🚀 Деплой</a> ·
 <a href="docs/ASSEMBLY.md">🔧 Сборка</a> ·
 <a href="docs/TESTING.md">🧪 Тесты</a>
