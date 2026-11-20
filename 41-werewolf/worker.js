@@ -14,7 +14,9 @@
 // 开局时会被自动剔除（群里只公布人数变化，绝不公布其身份）。
 // 规则口径（写死在本文件，要改改 maybeDawn）：狼刀取最先提交的一刀；
 // 女巫救药只能救狼刀、毒药无视救药；女巫整局各一瓶药。
-// 键设计：wolf:<群ID> 存对局；wolfroom:<用户ID> 存所在群（私聊反查）。
+// 键设计：wolf:<群ID> 局元信息、wolfp:<群ID>:<uid> 玩家、wolfn:/wolfv:
+// 夜晚行动与公投（全部按人拆键，防多人同时点击时整表回写互相覆盖）；
+// wolfroom:<用户ID> 存所在群（私聊反查）。
 // 部署后访问 https://你的Worker地址/setWebhook?key=你的WEBHOOK_SECRET
 // 拼装来源：模块 35（狼人杀主持人）+ 模块 01（骨架）+ 模块 02（分级菜单）
 // ============================================================
@@ -44,23 +46,100 @@ const answer = (env, cq, text) =>
 
 // ============================================================
 // 狼人杀对局状态（KV）
-// wolf:<群ID> = { phase:"lobby"|"night"|"day"|"over", host, round,
-// players:{ <uid>:{name, role, alive}}, night:{kill,check,save,poison,acted:[]},
-// votes:{ <投票人>:<目标>}, witchPotion:{save:1, poison:1}}
+// 并发要点：报名/公投/夜晚行动都是多人几乎同时点按钮，若把整局
+// 状态塞在一个 JSON 里「读-改-写」，后写的会盖掉先写的（实测出现
+// 过「回调提示报名成功、名单里却没有他」）。所以按写入主体拆键，
+// 每人只写自己的键，互不覆盖：
+// wolf:<群ID> = 局元信息 { phase, host, round, witchPotion }
+// wolfp:<群ID>:<uid> = { name, role, alive }（玩家一人一键）
+// wolfn:<群ID>:kill|check|save|poison = 夜晚行动结果（单人写）
+// wolfn:<群ID>:acted:<uid> = 已行动标记（一人一键）
+// wolfv:<群ID>:<投票人> = 目标 uid（公投一人一键）
 // wolfroom:<用户ID> = 群ID：夜晚行动在私聊里发生，靠它反查对局。
+// getGame() 把散键拼回整局对象给逻辑层用；状态变更走 setPlayer /
+// setNightField / setVote 等定点写，不再整表回写。注意 KV list 有
+// 最终一致延迟：刚写入的键可能几秒后才在 list 里可见，房主开局
+// 这类人工节奏的操作不受影响。
 // ============================================================
+async function saveMeta(env, chatId, g) {
+  await env.BOT_KV.put(
+    "wolf:" + chatId,
+    JSON.stringify({
+      phase: g.phase,
+      host: g.host,
+      round: g.round,
+      witchPotion: g.witchPotion,
+    }),
+  );
+}
+async function setPlayer(env, chatId, uid, p) {
+  await env.BOT_KV.put(`wolfp:${chatId}:${uid}`, JSON.stringify(p));
+}
+async function delPlayer(env, chatId, uid) {
+  await env.BOT_KV.delete(`wolfp:${chatId}:${uid}`);
+  await env.BOT_KV.delete("wolfroom:" + uid);
+}
+async function getNight(env, chatId) {
+  const pre = `wolfn:${chatId}:`;
+  const [kill, check, save, poison, acted] = await Promise.all([
+    env.BOT_KV.get(pre + "kill"),
+    env.BOT_KV.get(pre + "check"),
+    env.BOT_KV.get(pre + "save"),
+    env.BOT_KV.get(pre + "poison"),
+    env.BOT_KV.list({ prefix: pre + "acted:" }),
+  ]);
+  return {
+    kill: kill || null,
+    check: check || null,
+    save: save === "1",
+    poison: poison || null,
+    acted: acted.keys.map((k) => k.name.slice(pre.length + 6)),
+  };
+}
+async function setNightField(env, chatId, field, value) {
+  const key = `wolfn:${chatId}:${field}`;
+  if (value === null || value === undefined) await env.BOT_KV.delete(key);
+  else await env.BOT_KV.put(key, String(value));
+}
+async function getVotes(env, chatId) {
+  const pre = `wolfv:${chatId}:`;
+  const res = await env.BOT_KV.list({ prefix: pre });
+  const votes = {};
+  for (const k of res.keys) {
+    const v = await env.BOT_KV.get(k.name);
+    if (v) votes[k.name.slice(pre.length)] = v;
+  }
+  return votes;
+}
+async function setVote(env, chatId, voter, target) {
+  await env.BOT_KV.put(`wolfv:${chatId}:${voter}`, String(target));
+}
 async function getGame(env, chatId) {
   const raw = await env.BOT_KV.get("wolf:" + chatId);
-  return raw ? JSON.parse(raw) : null;
+  if (!raw) return null;
+  const g = JSON.parse(raw);
+  const pre = `wolfp:${chatId}:`;
+  const res = await env.BOT_KV.list({ prefix: pre });
+  g.players = {};
+  for (const k of res.keys) {
+    const v = await env.BOT_KV.get(k.name);
+    if (v) g.players[k.name.slice(pre.length)] = JSON.parse(v);
+  }
+  g.night = await getNight(env, chatId);
+  g.votes = await getVotes(env, chatId);
+  return g;
 }
-async function saveGame(env, chatId, g) {
-  await env.BOT_KV.put("wolf:" + chatId, JSON.stringify(g));
+async function clearRoundKeys(env, chatId) {
+  for (const pre of [`wolfn:${chatId}:`, `wolfv:${chatId}:`]) {
+    const res = await env.BOT_KV.list({ prefix: pre });
+    for (const k of res.keys) await env.BOT_KV.delete(k.name);
+  }
 }
 async function clearGame(env, chatId, g) {
   await env.BOT_KV.delete("wolf:" + chatId);
+  await clearRoundKeys(env, chatId);
   if (g)
-    for (const uid of Object.keys(g.players))
-      await env.BOT_KV.delete("wolfroom:" + uid);
+    for (const uid of Object.keys(g.players)) await delPlayer(env, chatId, uid);
 }
 const aliveOf = (g, role) =>
   Object.entries(g.players)
@@ -118,7 +197,9 @@ async function startGame(env, chatId, g) {
     );
     if (!r?.ok) {
       delete g.players[uid];
-      await env.BOT_KV.delete("wolfroom:" + uid);
+      await delPlayer(env, chatId, uid);
+    } else {
+      await setPlayer(env, chatId, uid, g.players[uid]);
     }
   }
   if (Object.keys(g.players).length < 4) {
@@ -133,7 +214,8 @@ async function startGame(env, chatId, g) {
   g.round = 1;
   g.night = freshNight();
   g.votes = {};
-  await saveGame(env, chatId, g);
+  await clearRoundKeys(env, chatId);
+  await saveMeta(env, chatId, g);
   await send(
     env,
     chatId,
@@ -197,7 +279,9 @@ async function witchPrompt(env, g) {
     if (g.witchPotion.save <= 0 && g.witchPotion.poison <= 0) continue;
     const rows = [];
     if (g.witchPotion.save > 0 && g.night.kill)
-      rows.push([{ text: "💊 用解药救今晚的刀口", callback_data: "wolf:save" }]);
+      rows.push([
+        { text: "💊 用解药救今晚的刀口", callback_data: "wolf:save" },
+      ]);
     if (g.witchPotion.poison > 0)
       for (const t of aliveOf(g))
         if (t !== uid)
@@ -238,10 +322,12 @@ async function onNightAction(env, cq, act, target) {
   if (act === "kill" && role === "wolf") {
     if (!g.night.kill) {
       g.night.kill = target;
+      await setNightField(env, chatId, "kill", target);
       firstKill = true;
     } // 首刀锁定，后来者只登记行动
   } else if (act === "check" && role === "seer") {
     g.night.check = target;
+    await setNightField(env, chatId, "check", target);
     const isWolf = g.players[target]?.role === "wolf";
     await send(
       env,
@@ -256,20 +342,26 @@ async function onNightAction(env, cq, act, target) {
   ) {
     g.night.save = true;
     g.witchPotion.save -= 1;
+    await setNightField(env, chatId, "save", "1");
+    await saveMeta(env, chatId, g);
   } else if (act === "poison" && role === "witch" && g.witchPotion.poison > 0) {
     g.night.poison = target;
     g.witchPotion.poison -= 1;
+    await setNightField(env, chatId, "poison", target);
+    await saveMeta(env, chatId, g);
   } else if (act === "pass" && role === "witch") {
     // 不用药，也算已行动
   } else return answer(env, cq, "这个行动不属于你（或药已用完/刀口未定）");
-  if (!g.night.acted.includes(me)) g.night.acted.push(me);
-  await saveGame(env, chatId, g);
+  if (!g.night.acted.includes(me)) {
+    g.night.acted.push(me);
+    await setNightField(env, chatId, "acted:" + me, "1");
+  }
   await answer(env, cq, "已记录");
   if (firstKill) await witchPrompt(env, g);
   return maybeDawn(env, chatId, g);
 }
 
-// 结算昨夜：毒杀无视救药，救药只救狼刀；算完进白天公投。
+// 三方都提交后自动天亮；房主强制推进也走同一个结算函数。
 async function maybeDawn(env, chatId, g) {
   const expect =
     (aliveOf(g, "wolf").length ? 1 : 0) +
@@ -279,18 +371,30 @@ async function maybeDawn(env, chatId, g) {
       ? 1
       : 0);
   if (g.night.acted.length < expect) return;
+  return dawnSettle(env, chatId, g, false);
+}
+
+// 结算昨夜：毒杀无视救药，救药只救狼刀；算完进白天公投。
+async function dawnSettle(env, chatId, g, forced) {
   const dead = new Set();
   if (g.night.poison) dead.add(g.night.poison);
   if (g.night.kill && !g.night.save) dead.add(g.night.kill);
-  for (const uid of dead) g.players[uid].alive = false;
+  for (const uid of dead) {
+    g.players[uid].alive = false;
+    await setPlayer(env, chatId, uid, g.players[uid]);
+  }
   g.phase = "day";
   g.votes = {};
-  await saveGame(env, chatId, g);
+  await clearRoundKeys(env, chatId);
+  await saveMeta(env, chatId, g);
   const names = [...dead].map((uid) => g.players[uid].name);
+  const head = forced
+    ? "🌅（强制推进）天亮了。"
+    : `🌅 第 ${g.round} 天天亮了。`;
   await send(
     env,
     chatId,
-    `🌅 第 ${g.round} 天天亮了。昨夜出局：${names.length ? names.join("、") : "无人（平安夜）"}。\n开始白天公投：点下方按钮投票（可改票），全员投完或房主点结算后放逐最高票。`,
+    `${head}昨夜出局：${names.length ? names.join("、") : "无人（平安夜）"}。\n开始白天公投：点下方按钮投票（可改票），全员投完或房主点结算后放逐最高票。`,
     { reply_markup: voteKeyboard(g) },
   );
   return checkWin(env, chatId, g);
@@ -316,6 +420,7 @@ async function tallyVotes(env, chatId, g) {
     await send(env, chatId, "没人投票，本轮无人出局。");
   } else {
     g.players[top[0]].alive = false;
+    await setPlayer(env, chatId, top[0], g.players[top[0]]);
     await send(
       env,
       chatId,
@@ -327,7 +432,8 @@ async function tallyVotes(env, chatId, g) {
   g.round += 1;
   g.night = freshNight();
   g.votes = {};
-  await saveGame(env, chatId, g);
+  await clearRoundKeys(env, chatId);
+  await saveMeta(env, chatId, g);
   await send(env, chatId, `🌕 第 ${g.round} 夜，天黑请闭眼。`, {
     reply_markup: {
       inline_keyboard: [
@@ -462,13 +568,15 @@ async function handle(env, update) {
       if (!g || g.phase !== "lobby")
         return answer(env, cq, "现在没有正在报名的局");
       if (g.players[me]) return answer(env, cq, "你已经报名了");
-      g.players[me] = {
+      const p = {
         name: cq.from.first_name || "玩家",
         role: null,
         alive: true,
       };
+      // 只写自己的玩家键：多人同时报名互不覆盖
+      await setPlayer(env, chatId, me, p);
       await env.BOT_KV.put("wolfroom:" + me, String(chatId));
-      await saveGame(env, chatId, g);
+      g.players[me] = p;
       await answer(env, cq, "✅ 报名成功，等房主开局");
       return tg(env, "editMessageText", {
         chat_id: chatId,
@@ -499,8 +607,9 @@ async function handle(env, update) {
       const g = await getGame(env, chatId);
       if (!g || g.phase !== "day") return answer(env, cq, "现在不是公投时间");
       if (!g.players[me]?.alive) return answer(env, cq, "出局者不能投票");
+      // 只写自己的一票：多人同时投票互不覆盖
+      await setVote(env, chatId, me, target);
       g.votes[me] = target;
-      await saveGame(env, chatId, g);
       await answer(env, cq, `已投 ${g.players[target]?.name || "目标"}`);
       if (Object.keys(g.votes).length >= aliveOf(g).length)
         return tallyVotes(env, chatId, g);
@@ -546,19 +655,23 @@ async function handle(env, update) {
         chatId,
         "本群已有一局在进行中（房主可联系管理员清局）。",
       );
+    const hostPlayer = {
+      name: msg.from.first_name || "房主",
+      role: null,
+      alive: true,
+    };
     const g = {
       phase: "lobby",
       host: me,
       round: 0,
-      players: {
-        [me]: { name: msg.from.first_name || "房主", role: null, alive: true },
-      },
+      players: { [me]: hostPlayer },
       night: freshNight(),
       votes: {},
       witchPotion: { save: 1, poison: 1 },
     };
+    await setPlayer(env, chatId, me, hostPlayer);
     await env.BOT_KV.put("wolfroom:" + me, String(chatId));
-    await saveGame(env, chatId, g);
+    await saveMeta(env, chatId, g);
     return send(env, chatId, lobbyText(g), { reply_markup: lobbyKeyboard() });
   }
 
@@ -596,21 +709,9 @@ async function maybeDawnForce(env, chatId, g) {
     ...aliveOf(g, "seer"),
     ...aliveOf(g, "witch"),
   ])
-    if (!g.night.acted.includes(uid)) g.night.acted.push(uid);
-  // acted 里狼人只算 1 票：补齐后长度必然 ≥ expect，直接结算
-  const dead = new Set();
-  if (g.night.poison) dead.add(g.night.poison);
-  if (g.night.kill && !g.night.save) dead.add(g.night.kill);
-  for (const uid of dead) g.players[uid].alive = false;
-  g.phase = "day";
-  g.votes = {};
-  await saveGame(env, chatId, g);
-  const names = [...dead].map((uid) => g.players[uid].name);
-  await send(
-    env,
-    chatId,
-    `🌅（强制推进）天亮了。昨夜出局：${names.length ? names.join("、") : "无人（平安夜）"}。开始白天公投：`,
-    { reply_markup: voteKeyboard(g) },
-  );
-  return checkWin(env, chatId, g);
+    if (!g.night.acted.includes(uid)) {
+      g.night.acted.push(uid);
+      await setNightField(env, chatId, "acted:" + uid, "1");
+    }
+  return dawnSettle(env, chatId, g, true);
 }
