@@ -67,6 +67,14 @@ function topTalkers(d, n = 5) {
 // 【核心模块】Worker 入口与路由
 // allowed_updates 含 chat_member，进退群计数靠它（Bot 在群里即可，不需管理员）。
 // ============================================================
+// ---------- Bot 命令菜单（部署时 /setWebhook 自动注册到输入框菜单） ----------
+const COMMANDS = [
+  { command: "stats", description: "今日群统计" },
+  { command: "stats7", description: "近 7 天群统计" },
+  { command: "mystats", description: "我今天发了几条" },
+  { command: "start", description: "使用说明" },
+];
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -88,7 +96,8 @@ export default {
         secret_token: env.WEBHOOK_SECRET,
         allowed_updates: ["message", "chat_member"],
       });
-      return Response.json({ setWebhook: hook, telegram: r });
+      const cm = await tg(env, "setMyCommands", { commands: COMMANDS });
+      return Response.json({ setWebhook: hook, telegram: r, commands: cm });
     }
     if (url.pathname !== "/webhook" || request.method !== "POST")
       return new Response("not found", { status: 404 });
