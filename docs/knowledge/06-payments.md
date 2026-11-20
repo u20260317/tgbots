@@ -49,3 +49,4 @@ Stars 是 Telegram 的平台内货币：用户用真实货币买 Stars，在 Bot
 - Stars 完整实现：[modules/24 Stars 官方支付](../../modules/24-stars-payment.md)。
 - 人工确认流：[modules/13 支付确认与自动发货](../../modules/13-payment-delivery.md)、模板 14（会员）/15（售货）。
 - 支付前的购物车与结账：[modules/22 商店目录与购物车](../../modules/22-shop.md)。
+- Stars 之外的加密支付（Crypto Pay 发票/Webhook 验签、TON 概念、四条路线选型）：[15 加密支付](15-crypto-payments.md)，实现看 [modules/49 Crypto Pay](../../modules/49-crypto-pay.md) 与模板 62。
