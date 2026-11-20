@@ -149,6 +149,14 @@ async function sweepExpired(env) {
 // 【核心模块】Worker 入口与路由
 // fetch 管 Bot 交互，scheduled 管到期巡检，两条路共用上面的存储与支付模块。
 // ============================================================
+// ---------- Bot 命令菜单（部署时 /setWebhook 自动注册到输入框菜单） ----------
+const COMMANDS = [
+  { command: "start", description: "选套餐开通会员" },
+  { command: "my", description: "我的会员有效期" },
+  { command: "subs", description: "会员人数（管理员）" },
+  { command: "sweep", description: "到期巡检（管理员）" },
+];
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -170,7 +178,8 @@ export default {
         secret_token: env.WEBHOOK_SECRET,
         allowed_updates: ["message", "callback_query"],
       });
-      return Response.json({ setWebhook: hook, telegram: r });
+      const cm = await tg(env, "setMyCommands", { commands: COMMANDS });
+      return Response.json({ setWebhook: hook, telegram: r, commands: cm });
     }
     if (url.pathname !== "/webhook" || request.method !== "POST")
       return new Response("not found", { status: 404 });
