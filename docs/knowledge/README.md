@@ -2,6 +2,41 @@
 
 从零基础到天花板：这一套文档只讲**知识与原理**——Bot 世界是怎么运转的、每个机制为什么这样设计、边界在哪里。**代码**不在这里，去 [modules/ 模块库](../../modules/README.md) 抄（50 篇）；**模板**在仓库根目录的 82 个编号目录与 3 个组合里；部署步骤看 [docs/DEPLOY.md](../DEPLOY.md)，拼装方法看 [docs/ASSEMBLY.md](../ASSEMBLY.md)，架构取舍看 [docs/DESIGN.md](../DESIGN.md)，测试记录看 [docs/TESTING.md](../TESTING.md)。
 
+先看全景：
+
+```mermaid
+mindmap
+  root((Telegram Bot 知识图谱))
+    零基础路径
+      01 入门
+      03 Webhook
+      04 消息媒体
+      05 键盘交互
+    进阶路径
+      06 支付
+      15 加密支付
+      07 Mini App
+      14 富交互
+      13 Business
+      08 限流性能
+      18 免费额度
+      09 安全
+      19 付费课程教程
+    专家路径
+      02 API 全景
+      12 Managed Bots
+      10 架构规模
+      17 KV 一致性
+      16 测试方法论
+      11 调试运维
+      20 API 演进
+    支撑体系
+      模块库
+      模板库
+      部署与拼装
+      测试记录
+```
+
 ## 学习路径
 
 ### 🌱 零基础线（从没写过 Bot）
