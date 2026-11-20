@@ -64,6 +64,7 @@
 | 37 | 贴纸制作 | 2026-11-20 | L4 | ✅ | 以「文件」发 PNG（假 file_id）后 KV 读回 stk:pend:700000037={source:FAKE_PNG_FILE_ID} 并弹 emoji 键盘；发普通照片走未配 STICKER_RESIZER 的规格提示分支 200；选 emoji 回调真实调用 createNewStickerSet，因假用户/假 file_id 在 Telegram 侧必然失败、按设计走失败提示分支且 pend 保留（读回仍在）；stk:cancel 后 pend 读回 404 已删；错密钥 403。真实建包需真人真图，属环境边界 |
 | 38 | 天气预报 | 2026-11-20 | L4 | ✅ | 真调 Open-Meteo 成功：/sub 北京 后 KV 读回 wx:sub:700000038 = {name:北京 · 北京市 · 中国, lat:39.9075, lon:116.39723, tz:Asia/Shanghai}，坐标为地理编码接口真实返回（落库前先验城市存在）；/tq 北京、/mysub 均 200；/unsub 后订阅键读回 404 已删；错密钥 403 |
 | 39 | GitHub 通知 | 2026-11-20 | L4 | ✅ | /ghbind 后 KV 读回 gh:700000039 绑定（含 secret/by/at）；用绑定密钥对模拟 push 载荷做 HMAC-SHA256 签名 POST /github/700000039 → 200 ok（格式化推送被调用，发往模拟聊天在 TG 侧静默失败）；错签名同载荷 → 401 bad signature；ping 事件好签名 → 200。验签用原始字节 + 常量时间比较，与 GitHub 规范一致 |
+| 40 | Inline 工具箱 | 2026-11-20 | L4 | ✅ | 线上部署/健康/setWebhook（allowed_updates 带 inline_query）+ 模拟 inline_query 更新 200、错密钥 403；answerInlineQuery 载荷经本地 harness（同一 worker.js、打桩 api.telegram.org）捕获验证：`1+2*3` → 「🧮 1+2*3 = 7」、`10 km mi` → 「10 km = 6.21371192 mi」、「webhook」命中内置词库 2 条、`ts` 返回当前时间戳，结果结构与数值均正确 |
 
 **全量测试完成（2026-11-20）**：30 个单体 + 3 个组合全部实测完毕。共发现并修复模板 bug 1 个（17 号 name 重复拼 ID，commit 1b8bf6e）。测试中多次出现的部署后首请求 404/500 与 setWebhook 1042 均为 Cloudflare 传播期抖动，复测均通过，已在各行备注中区分记录，未计为模板问题。
 
