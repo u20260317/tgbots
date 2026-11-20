@@ -49,6 +49,11 @@
 | 43 | [PDF 工具](43-pdf-tools.md) | 纯 JS JPEG 拼 PDF、PDF 提文字走 OCR、转图/合并/拆分走外部 API | 新增扩展（模板 49） |
 | 44 | [音乐下载与识曲](44-music.md) | 可替换解析层下音频、AudD 指纹识曲、版权边界 | 32 姊妹篇（模板 50） |
 | 45 | [HTML5 游戏平台](45-games.md) | sendGame 发卡、签名令牌身份注入、setGameScore 记分与总榜 | 新增扩展（模板 51） |
+| 46 | [AI 绘图 API 适配](46-ai-image-gen.md) | OpenAI 兼容 images 口径文生图/图生图、b64/url 双回图、换源点 | 新增扩展（模板 55 / 82） |
+| 47 | [间隔重复算法](47-spaced-repetition.md) | SM-2 简化版：ease/interval/due 计算与 KV 存法、到期扫描 | 新增扩展（模板 58） |
+| 48 | [网页快照与 diff](48-web-snapshot-diff.md) | 正文提取、SHA-256 哈希哨兵、行级 diff 摘要、抓取礼仪 | 新增扩展（模板 60 / 76） |
+| 49 | [Crypto Pay 加密支付](49-crypto-pay.md) | Crypto Pay 发票创建、Webhook HMAC 验签、paid: 幂等到账 | 新增扩展（商店加挂） |
+| 50 | [匹配队列](50-matching-queue.md) | 一人一键队列、防重复配对、镜像会话键、举报封禁骨架 | 新增扩展（模板 52 / 77） |
 
 ## 怎么用
 
