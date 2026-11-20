@@ -1,6 +1,6 @@
 # tgbots · Telegram Bot 单文件合集（Cloudflare Workers）
 
-9 个常用 TG Bot，**每个都是一个独立的 `worker.js` 单文件**：复制粘贴（或拖拽）到 Cloudflare Worker 即可部署，零依赖、零服务器、跑在 Workers 免费额度里。一个 Bot 用一个 Worker、一个 Bot Token，互不干扰，各从其类。
+10 个常用 TG Bot，**每个都是一个独立的 `worker.js` 单文件**：复制粘贴（或拖拽）到 Cloudflare Worker 即可部署，零依赖、零服务器、跑在 Workers 免费额度里。一个 Bot 用一个 Worker、一个 Bot Token，互不干扰，各从其类。
 
 ## 目录
 
@@ -15,6 +15,7 @@
 | 07 | 菜单/自动回复 | [07-menu-faq](07-menu-faq/) | 多级菜单 + 关键词自动回复，改配置区即改内容 | 否 |
 | 08 | ID 查询工具 | [08-id-tools](08-id-tools/) | 查用户/群/频道 ID 和 file_id，配其它 Bot 用 | 否 |
 | 09 | 订阅群发 | [09-broadcast](09-broadcast/) | /start 订阅、管理员 /broadcast 群发通知 | ✅ |
+| 10 | 网盘（私有频道存储） | [10-cloud-drive](10-cloud-drive/) | 文件转存私有频道当硬盘，列表/搜索/标签/分享链接 | ✅ |
 
 每个目录里都有自己的 `README.md`（变量清单 + 注意事项）。
 
@@ -28,7 +29,7 @@
 
 - **Bot Token 只填进 Cloudflare 的 Secret 变量里，不要写进代码、不要发到聊天/群里。** 泄露后去 @BotFather 用 /revoke 重置。
 - `WEBHOOK_SECRET` 随便编一串长随机字符即可，它同时是 `/setWebhook` 的访问口令。
-- 无状态设计：01–05、07、08 不用任何数据库（靠消息转发/按钮里编码的坐标工作）；06、09 需要绑定一个 KV（只存极小的映射/名单）。
+- 无状态设计：01–05、07、08 不用任何数据库（靠消息转发/按钮里编码的坐标工作）；06、09、10 需要绑定一个 KV（只存极小的映射/名单/目录索引，文件本体都在 Telegram 服务器上）。
 
 ## 组合玩法
 
