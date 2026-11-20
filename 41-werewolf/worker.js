@@ -79,21 +79,25 @@ async function delPlayer(env, chatId, uid) {
   await env.BOT_KV.delete(`wolfp:${chatId}:${uid}`);
   await env.BOT_KV.delete("wolfroom:" + uid);
 }
-async function getNight(env, chatId) {
+async function getNight(env, chatId, playerIds) {
   const pre = `wolfn:${chatId}:`;
-  const [kill, check, save, poison, acted] = await Promise.all([
+  const [kill, check, save, poison] = await Promise.all([
     env.BOT_KV.get(pre + "kill"),
     env.BOT_KV.get(pre + "check"),
     env.BOT_KV.get(pre + "save"),
     env.BOT_KV.get(pre + "poison"),
-    env.BOT_KV.list({ prefix: pre + "acted:" }),
   ]);
+  // acted 标记按玩家逐个直读单键：list 有边缘缓存延迟，逐键 get 新鲜得多
+  const acted = [];
+  for (const uid of playerIds || []) {
+    if ((await env.BOT_KV.get(pre + "acted:" + uid)) === "1") acted.push(uid);
+  }
   return {
     kill: kill || null,
     check: check || null,
     save: save === "1",
     poison: poison || null,
-    acted: acted.keys.map((k) => k.name.slice(pre.length + 6)),
+    acted,
   };
 }
 async function setNightField(env, chatId, field, value) {
@@ -101,13 +105,13 @@ async function setNightField(env, chatId, field, value) {
   if (value === null || value === undefined) await env.BOT_KV.delete(key);
   else await env.BOT_KV.put(key, String(value));
 }
-async function getVotes(env, chatId) {
-  const pre = `wolfv:${chatId}:`;
-  const res = await env.BOT_KV.list({ prefix: pre });
+async function getVotes(env, chatId, playerIds) {
+  // 投票人必是玩家：按玩家逐个直读单键，避免 list 延迟导致「全员
+  // 已投完却不自动结算」
   const votes = {};
-  for (const k of res.keys) {
-    const v = await env.BOT_KV.get(k.name);
-    if (v) votes[k.name.slice(pre.length)] = v;
+  for (const uid of playerIds || []) {
+    const v = await env.BOT_KV.get(`wolfv:${chatId}:${uid}`);
+    if (v) votes[uid] = v;
   }
   return votes;
 }
@@ -125,8 +129,9 @@ async function getGame(env, chatId) {
     const v = await env.BOT_KV.get(k.name);
     if (v) g.players[k.name.slice(pre.length)] = JSON.parse(v);
   }
-  g.night = await getNight(env, chatId);
-  g.votes = await getVotes(env, chatId);
+  const playerIds = Object.keys(g.players);
+  g.night = await getNight(env, chatId, playerIds);
+  g.votes = await getVotes(env, chatId, playerIds);
   return g;
 }
 async function clearRoundKeys(env, chatId) {
