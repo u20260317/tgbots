@@ -14,6 +14,10 @@
 // ============================================================
 
 const admins = (env) => String(env.ADMIN_ID || "").split(",").map((s) => s.trim()).filter(Boolean);
+// ============================================================
+// 【核心模块】Telegram Bot API 通信层
+// 统一封装 tg()：所有给 Telegram 发的请求都走这里，改 API 地址/加重试只改这一处。
+// ============================================================
 async function tg(env, method, payload) {
   const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
@@ -23,6 +27,10 @@ async function tg(env, method, payload) {
 const send = (env, chat_id, text, extra = {}) => tg(env, "sendMessage", { chat_id, text, ...extra });
 const code = () => Array.from(crypto.getRandomValues(new Uint8Array(6))).map((b) => "abcdefghjkmnpqrstuvwxyz23456789"[b % 31]).join("");
 
+// ============================================================
+// 【核心模块】文件类型识别
+// 从消息里提取文件类型与 file_id，存文件和按类型回发都靠它。
+// ============================================================
 function fileOf(msg) {
   if (msg.document) return { kind: "document", id: msg.document.file_id, name: msg.document.file_name || "文件" };
   if (msg.photo?.length) return { kind: "photo", id: msg.photo[msg.photo.length - 1].file_id, name: "图片" };
@@ -36,6 +44,10 @@ const sendByKind = (env, chat_id, f, caption) =>
   tg(env, { document: "sendDocument", photo: "sendPhoto", video: "sendVideo", audio: "sendAudio", voice: "sendVoice", animation: "sendAnimation" }[f.kind] || "sendDocument",
     { chat_id, [f.kind]: f.id, caption: caption || undefined });
 
+// ============================================================
+// 【核心模块】Worker 入口与路由
+// 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
+// ============================================================
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -56,6 +68,10 @@ export default {
   },
 };
 
+// ============================================================
+// 【核心模块】业务主流程
+// 文件分享业务主流程（存 file_id 生成短码链接、深链取件）。这是本 Bot 真正干活的地方，其余都是它的地基。
+// ============================================================
 async function handle(env, update) {
   const msg = update.message;
   if (!msg || msg.chat.type !== "private") return;
