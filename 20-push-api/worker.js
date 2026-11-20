@@ -87,6 +87,12 @@ async function handlePush(request, env, url) {
 // 【核心模块】Worker 入口与路由
 // 一个 Worker 两个入口：/push 走推送接口，/webhook 走 Bot 命令，互不干扰。
 // ============================================================
+// ---------- Bot 命令菜单（部署时 /setWebhook 自动注册到输入框菜单） ----------
+const COMMANDS = [
+  { command: "start", description: "我的推送网址" },
+  { command: "id", description: "查当前会话 ID" },
+];
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -109,7 +115,8 @@ export default {
         secret_token: env.WEBHOOK_SECRET,
         allowed_updates: ["message"],
       });
-      return Response.json({ setWebhook: hook, telegram: r });
+      const cm = await tg(env, "setMyCommands", { commands: COMMANDS });
+      return Response.json({ setWebhook: hook, telegram: r, commands: cm });
     }
     if (url.pathname !== "/webhook" || request.method !== "POST")
       return new Response("not found", { status: 404 });
