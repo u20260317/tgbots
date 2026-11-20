@@ -63,6 +63,7 @@
 | 36 | 个人提醒/待办 | 2026-11-20 | L4 | ✅（修 1 bug） | 时间解析读回验证：「10分钟后 交房租」at≈当前+600s、「明天 9:00 开会」at 精确等于次日 09:00 CST，均落 rem:<uid>:<id>；待办 /todo 落 todo: 数组；回调按设计语义验证（rem: 前缀统管待办与提醒）：rem:done:<待办ID> 勾选后读回 done=true、rem:delrem:<提醒ID> 删除后读回 404；/reminders 200、错密钥 403。Cron 到点推送无法经 HTTP 触发（已知限制）。**bug**：parseWhen 相对时间三分支（分钟后/小时后/天后）rest 未 trim，提醒文本带前导空格（其余分支均 trim）；已修（三处补 .trim()，commit 54e52b7），重新部署复测落盘文本为「交房租」无空格 |
 | 37 | 贴纸制作 | 2026-11-20 | L4 | ✅ | 以「文件」发 PNG（假 file_id）后 KV 读回 stk:pend:700000037={source:FAKE_PNG_FILE_ID} 并弹 emoji 键盘；发普通照片走未配 STICKER_RESIZER 的规格提示分支 200；选 emoji 回调真实调用 createNewStickerSet，因假用户/假 file_id 在 Telegram 侧必然失败、按设计走失败提示分支且 pend 保留（读回仍在）；stk:cancel 后 pend 读回 404 已删；错密钥 403。真实建包需真人真图，属环境边界 |
 | 38 | 天气预报 | 2026-11-20 | L4 | ✅ | 真调 Open-Meteo 成功：/sub 北京 后 KV 读回 wx:sub:700000038 = {name:北京 · 北京市 · 中国, lat:39.9075, lon:116.39723, tz:Asia/Shanghai}，坐标为地理编码接口真实返回（落库前先验城市存在）；/tq 北京、/mysub 均 200；/unsub 后订阅键读回 404 已删；错密钥 403 |
+| 39 | GitHub 通知 | 2026-11-20 | L4 | ✅ | /ghbind 后 KV 读回 gh:700000039 绑定（含 secret/by/at）；用绑定密钥对模拟 push 载荷做 HMAC-SHA256 签名 POST /github/700000039 → 200 ok（格式化推送被调用，发往模拟聊天在 TG 侧静默失败）；错签名同载荷 → 401 bad signature；ping 事件好签名 → 200。验签用原始字节 + 常量时间比较，与 GitHub 规范一致 |
 
 **全量测试完成（2026-11-20）**：30 个单体 + 3 个组合全部实测完毕。共发现并修复模板 bug 1 个（17 号 name 重复拼 ID，commit 1b8bf6e）。测试中多次出现的部署后首请求 404/500 与 setWebhook 1042 均为 Cloudflare 传播期抖动，复测均通过，已在各行备注中区分记录，未计为模板问题。
 
