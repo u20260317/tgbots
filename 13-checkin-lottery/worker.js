@@ -194,9 +194,56 @@ async function handle(env, update) {
     return;
   }
 
+  // ---------- 排行榜分页（/top 与翻页按钮共用） ----------
+  // 每页 10 条；翻页按钮回调 top:<页码>，页码指示按钮是 top:noop（点了无动作）。
+  const TOP_PAGE = 10;
+  async function topRows() {
+    const list = await env.BOT_KV.list({ prefix: "pts:", limit: 1000 });
+    const rows = [];
+    for (const k of list.keys) {
+      const raw = await env.BOT_KV.get(k.name);
+      if (raw) {
+        const p = JSON.parse(raw);
+        rows.push({ name: p.name || k.name.slice(4), p: p.p });
+      }
+    }
+    rows.sort((a, b) => b.p - a.p);
+    return rows;
+  }
+  function topView(rows, page) {
+    const pages = Math.max(1, Math.ceil(rows.length / TOP_PAGE));
+    const p = Math.min(Math.max(0, page), pages - 1);
+    const text =
+      "🏆 积分榜\n\n" +
+      rows
+        .slice(p * TOP_PAGE, p * TOP_PAGE + TOP_PAGE)
+        .map((r, i) => `${p * TOP_PAGE + i + 1}. ${r.name} — ${r.p} 分`)
+        .join("\n");
+    if (pages <= 1) return { text };
+    const nav = [];
+    if (p > 0) nav.push({ text: "⬅️ 上一页", callback_data: `top:${p - 1}` });
+    nav.push({ text: `${p + 1}/${pages}`, callback_data: "top:noop" });
+    if (p < pages - 1)
+      nav.push({ text: "下一页 ➡️", callback_data: `top:${p + 1}` });
+    return { text, reply_markup: { inline_keyboard: [nav] } };
+  }
+
   // ---------- 抽奖报名按钮 ----------
   const cq = update.callback_query;
   if (cq) {
+    if (String(cq.data || "").startsWith("top:")) {
+      if (cq.data === "top:noop")
+        return tg(env, "answerCallbackQuery", { callback_query_id: cq.id });
+      const rows = await topRows();
+      const v = topView(rows, parseInt(cq.data.slice(4), 10) || 0);
+      await tg(env, "answerCallbackQuery", { callback_query_id: cq.id });
+      return tg(env, "editMessageText", {
+        chat_id: cq.message.chat.id,
+        message_id: cq.message.message_id,
+        text: v.text,
+        ...(v.reply_markup ? { reply_markup: v.reply_markup } : {}),
+      });
+    }
     if (!String(cq.data || "").startsWith("lj:")) return;
     const lotId = cq.data.slice(3);
     const lot = await getLottery(env, lotId);
@@ -290,26 +337,15 @@ async function handle(env, update) {
 
   // ---------- 排行榜 ----------
   if (cmd === "/top") {
-    const list = await env.BOT_KV.list({ prefix: "pts:", limit: 1000 });
-    const rows = [];
-    for (const k of list.keys) {
-      const raw = await env.BOT_KV.get(k.name);
-      if (raw) {
-        const p = JSON.parse(raw);
-        rows.push({ name: p.name || k.name.slice(4), p: p.p });
-      }
-    }
-    rows.sort((a, b) => b.p - a.p);
+    const rows = await topRows();
     if (!rows.length)
       return send(env, chatId, "还没有人签到，快发 /qd 抢榜一。");
+    const v = topView(rows, 0);
     return send(
       env,
       chatId,
-      "🏆 积分榜 Top 10\n\n" +
-        rows
-          .slice(0, 10)
-          .map((r, i) => `${i + 1}. ${r.name} — ${r.p} 分`)
-          .join("\n"),
+      v.text,
+      v.reply_markup ? { reply_markup: v.reply_markup } : {},
     );
   }
 
