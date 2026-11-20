@@ -1,8 +1,37 @@
-# tgbots · Telegram Bot 单文件合集（Cloudflare Workers）
+# 🧩 tgbots · Telegram Bot 单文件模板库
 
-30 个常用 TG Bot，**每个都是一个独立的 `worker.js` 单文件**：复制粘贴（或拖拽）到 Cloudflare Worker 即可部署，零依赖、零服务器、跑在 Workers 免费额度里。一个 Bot 用一个 Worker、一个 Bot Token，互不干扰，各从其类。
+[![Stars](https://img.shields.io/github/stars/u20260317/tgbots?style=flat-square)](https://github.com/u20260317/tgbots/stargazers)
+[![Forks](https://img.shields.io/github/forks/u20260317/tgbots?style=flat-square)](https://github.com/u20260317/tgbots/forks)
+[![Last commit](https://img.shields.io/github/last-commit/u20260317/tgbots?style=flat-square)](https://github.com/u20260317/tgbots/commits/main)
+[![License](https://img.shields.io/github/license/u20260317/tgbots?style=flat-square)](LICENSE)
+![Language](https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square)
 
-## 目录
+**30 个常用 Telegram Bot，每个都是一个独立的 `worker.js` 单文件**：复制粘贴到 Cloudflare Worker 即可部署——零依赖、零服务器、跑在 Workers 免费额度里。另有 **19 篇模块文档**把常用能力拆成积木，照着拼就能组出自己的 Bot。
+
+## ✨ 特色
+
+- 📄 **真单文件**：一个 Bot = 一个 `worker.js`，无构建、无依赖，拖进 Worker 就跑
+- 🧪 **全部实测**：33 个对象逐个真部署验证，测试记录公开在 [docs/TESTING.md](docs/TESTING.md)
+- 🧩 **积木式模块**：核心模块都有 `【核心模块】` 注释横幅 + [模块库文档](modules/README.md)，整段拆出复用
+- 🎛️ **分级命令菜单**：管理员命令只出现在管理员菜单里（白名单 + scope 注册），普通用户看不见
+- 🔐 **安全默认**：Token 只进 Secret、webhook 带密钥校验、管理员按数字 ID 白名单
+- 💸 **零成本**：状态存免费 KV、文件存 Telegram 本身，不用买服务器
+
+## 🚀 快速开始
+
+1. @BotFather 建 Bot 拿 Token
+2. Cloudflare 新建 Worker，把某个 `worker.js` 粘贴部署
+3. Worker 变量里填 `BOT_TOKEN`（设为 Secret）等配置
+4. 打开 `https://你的Worker地址/setWebhook?key=你设的WEBHOOK_SECRET`
+5. 回 Telegram 里发命令测试
+
+手把手图文步骤、怎么查各种 ID、KV 怎么绑、常见报错：见 [docs/DEPLOY.md](docs/DEPLOY.md)。
+
+## 🗂️ 导航
+
+[模板目录](#-模板目录) · [模块库](modules/README.md) · [部署文档](docs/DEPLOY.md) · [设计文档](docs/DESIGN.md) · [拼装指南](docs/ASSEMBLY.md) · [测试记录](docs/TESTING.md)
+
+## 📚 模板目录
 
 | # | 类型 | 目录 | 一句话 | 需要 KV |
 |---|------|------|--------|:---:|
@@ -37,13 +66,12 @@
 | 29 | 匿名信箱 | [29-anonymous-box](29-anonymous-box/) | 专属链接收匿名留言，回复即匿名回信 | ✅ |
 | 30 | 客服工单 | [30-support-ticket](30-support-ticket/) | 带编号工单+客服群协作回复，按钮关单 | ✅ |
 
+
 每个目录里都有自己的 `README.md`（变量清单 + 注意事项）。
 
-## 快速开始
+## 🧩 模块库
 
-1. @BotFather 建 Bot 拿 Token → 2. Cloudflare 新建 Worker，把某个 `worker.js` 粘贴部署 → 3. 在 Worker 变量里填 `BOT_TOKEN` 等（Token 设为 Secret）→ 4. 打开 `https://Worker地址/setWebhook?key=你设的WEBHOOK_SECRET` → 5. Telegram 里测试。
-
-手把手图文步骤、怎么查各种 ID、KV 怎么绑、常见报错：见 [docs/DEPLOY.md](docs/DEPLOY.md)。
+常用能力已拆成 19 篇独立模块文档（原理 + 可复制的真实代码 + 接入步骤 + 注意点）：基础骨架、管理员白名单与分级菜单、按钮与回调、KV 存储、频道发帖、强制订阅、转发路由、文件存储、Cron、审核流、群管理、入群审核、支付发货、邀请归因、RSS、签到抽奖、配置菜单、竞答会话、外部 API。写新 Bot 先来挑积木：[modules/README.md](modules/README.md)。
 
 ## 代码规范（积木式模块）
 
