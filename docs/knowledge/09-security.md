@@ -56,5 +56,5 @@ Bot 的安全面：token 保管、webhook 验签、管理员鉴权、输入与�
 ## 在本库里看哪里落地
 
 - 鉴权与分级菜单：[modules/02 管理员白名单与分级命令菜单](../../modules/02-admin-menu.md)。
-- 代管加密：[modules/21 母体 Bot 多租户托管](../../modules/21-mother-bot.md) 的风险一节（全库安全等级最高的模块）。
+- 代管加密：[modules/21 母体 Bot 多租户托管](../../modules/21-mother-bot.md) 的风险一节（全库安全等级最高的模块）；官方 Managed Bots 路线的代管义务对照见 [12 Managed Bots 全解](12-managed-bots.md) 与模板 54。
 - 全库安全模型总述：[docs/DESIGN.md](../DESIGN.md)。
