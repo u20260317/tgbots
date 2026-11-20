@@ -14,7 +14,7 @@
 <img src="https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square" alt="Language">
 </p>
 
-**30 everyday Telegram bots, each a single standalone `worker.js` file**: copy-paste into a Cloudflare Worker and deploy — zero dependencies, zero servers, runs on the Workers free tier. Plus **34 module docs** that break common capabilities into building blocks you can assemble into your own bot.
+**40 everyday Telegram bots, each a single standalone `worker.js` file**: copy-paste into a Cloudflare Worker and deploy — zero dependencies, zero servers, runs on the Workers free tier. Plus **42 module docs** that break common capabilities into building blocks you can assemble into your own bot.
 
 <p>
 <a href="#-templates">📚 Templates</a> ·
@@ -84,13 +84,23 @@ Step-by-step with screenshots, how to find every ID, how to bind KV, common erro
 | 28 | Toolbox | [28-toolbox](28-toolbox/) | QR codes, short links, hashes, Base64, UUID, random pick, timestamps | No |
 | 29 | Anonymous Inbox | [29-anonymous-box](29-anonymous-box/) | A personal link to receive anonymous messages; replies go back anonymously | ✅ |
 | 30 | Support Tickets | [30-support-ticket](30-support-ticket/) | Numbered tickets + support-group collaboration, close with a button | ✅ |
+| 31 | AI Chat | [31-ai-chat](31-ai-chat/) | OpenAI-compatible chat: per-user context, personas, /reset, daily quota | ✅ |
+| 32 | Mother Bot | [32-mother-bot](32-mother-bot/) | Clone platform: FSM onboarding, encrypted token custody, multi-tenant dispatch | ✅ |
+| 33 | Mall Bot | [33-mall-bot](33-mall-bot/) | Franchise shops: HQ catalog, your own storefront bot, owner-confirmed delivery | ✅ |
+| 34 | Video Download | [34-video-download](34-video-download/) | Link parsing via a replaceable resolver, files up to 50MB sent back | ✅ |
+| 35 | Speech to Text | [35-speech-to-text](35-speech-to-text/) | Voice messages auto-transcribed (Whisper-compatible API) | ✅ |
+| 36 | Personal Reminder | [36-personal-reminder](36-personal-reminder/) | Natural-language reminders, recurring schedules, todo list | ✅ |
+| 37 | Sticker Maker | [37-sticker-maker](37-sticker-maker/) | Turn photos/files into sticker packs | ✅ |
+| 38 | Weather | [38-weather](38-weather/) | Open-Meteo forecasts + daily forecast subscription | ✅ |
+| 39 | GitHub Notify | [39-github-notify](39-github-notify/) | GitHub webhooks verified by HMAC and pushed as formatted messages | ✅ |
+| 40 | Inline Tools | [40-inline-tools](40-inline-tools/) | Inline mode: search, unit conversion, calculator, timestamps in any chat | No |
 
 
 Every directory has its own `README.md` (variable list + gotchas).
 
 ## 🧩 Module Library
 
-Common capabilities are broken into 34 standalone module docs (principles + copy-paste real code + integration steps + caveats): foundation, admin whitelist & tiered menus, buttons & callbacks, KV storage, channel posting, force-subscribe checks, forward routing, file storage, Cron, review flow, group management, join-request review, payment & delivery, referral attribution, RSS, check-in & lottery, config-driven menus, quiz sessions, external APIs, FSM state machine, mother-bot multi-tenancy, shop catalog & cart, franchise malls, Stars payments, AI chat, inline mode, rate limiting & retries, Mini Apps, i18n, speech-to-text, advanced translation, video downloading, advanced group guarding, personal reminders. Start here when building your own: [modules/README.md](modules/README.md).
+Common capabilities are broken into 42 standalone module docs (principles + copy-paste real code + integration steps + caveats): foundation, admin whitelist & tiered menus, buttons & callbacks, KV storage, channel posting, force-subscribe checks, forward routing, file storage, Cron, review flow, group management, join-request review, payment & delivery, referral attribution, RSS, check-in & lottery, config-driven menus, quiz sessions, external APIs, FSM state machine, mother-bot multi-tenancy, shop catalog & cart, franchise malls, Stars payments, werewolf hosting, stickers, image/OCR tools, native polls & reactions, forum topics, URL upload, notify adapters, paid media, AI chat, inline mode, rate limiting & retries, Mini Apps, i18n, speech-to-text, advanced translation, video downloading, advanced group guarding, personal reminders. Start here when building your own: [modules/README.md](modules/README.md).
 
 ## Code Conventions (building blocks)
 
