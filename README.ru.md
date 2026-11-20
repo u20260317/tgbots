@@ -79,7 +79,7 @@
 
 | Комбинация | Каталог | Состав |
 |------|--------|------|
-| Канал под ключ | [combos/combo-channel-ops](combos/combo-channel-ops/) | 01 публикация + 05投稿 + 02 двусторонний |
+| Канал под ключ | [combos/combo-channel-ops](combos/combo-channel-ops/) | 01 публикация + 05 модерация + 02 поддержка |
 | Страж сообщества | [combos/combo-group-guard](combos/combo-group-guard/) | 03 подписка + 04 управление группой |
 | Диск за подпиской | [combos/combo-drive-gate](combos/combo-drive-gate/) | 03 подписка + 10 диск |
 
