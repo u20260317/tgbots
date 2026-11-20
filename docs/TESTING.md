@@ -59,6 +59,7 @@
 | 32 | 母体 Bot | 2026-11-20 | L4 | ✅ | 入驻向导全程 200：/new → mb:type:checkin → 发测试 Bot 自身 Token（getMe 验真）→ mb:go 开通；KV 读回 bot:<slug> 记录，tokenEnc 为 AES-GCM 密文（iv.ct 格式、不含明文），botId/type/owner 正确；子 Bot 分发：带租户 secret 向 /w/<slug> 发 /qd，租户前缀键 t:9010372669:pts:700000132 读回 {p:10, streak:1, last:2026-11-20}，签到内核与 KV 隔离均生效；错租户密钥 403；错母体密钥 403 |
 | 33 | 商城 Bot | 2026-11-20 | L4 | ✅ | 全链读回验证：总部 /hqadd 上架 mall:prod（批发 50）；开店向导（选模式→Token 验真→店名→mall:go）生成 bot: 店铺记录（tokenEnc 密文、店名/模式/加价 20% 正确）；子店店主 /addprod+/addstock 落租户 prod（stock=[CARD-MALL-001]）；买家购物车读回 {hq:1, own:1}，结账订单 total=90（总部货源店面价 60=批发×1.2）、status=waitconfirm；店主 payok 后订单 done 且库存弹空 []。注：开店装配与库存扣减的 KV 读回各出现一次长延迟（约 2 分钟才可见），复读后无误，属 KV 传播慢非 bug |
 | 34 | 视频解析下载 | 2026-11-20 | L4 | ✅ | 未配 RESOLVER_API（演示模式）：/start、发链接后 KV 读回任务 dl:ra37（含 url/uid、10 分钟过期）；点画质按钮 dl:v: 走演示模式解析失败提示路径 200（按设计不计次、不删任务）；点取消 dl:x: 后缀 dl: 读回为空，任务已删；管理员 /dlstats 200，错密钥 403。真实解析需自备 cobalt 兼容服务，属部署配置项 |
+| 35 | 语音转文字 | 2026-11-20 | L4 | ✅ | 未配 STT_API_KEY：私聊发语音（假 file_id）走「未配置转写服务」报错分支 200；群内管理员 /stt on 后 KV 读回 stt:on:-1000000000035 = 1，开着的群内语音同样走无 Key 分支 200；/stt off 后该键读回 404（已删）；错密钥 403。真实转写需配 Groq/OpenAI Key，属部署配置项 |
 
 **全量测试完成（2026-11-20）**：30 个单体 + 3 个组合全部实测完毕。共发现并修复模板 bug 1 个（17 号 name 重复拼 ID，commit 1b8bf6e）。测试中多次出现的部署后首请求 404/500 与 setWebhook 1042 均为 Cloudflare 传播期抖动，复测均通过，已在各行备注中区分记录，未计为模板问题。
 
