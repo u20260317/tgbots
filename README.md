@@ -1,6 +1,6 @@
 # tgbots · Telegram Bot 单文件合集（Cloudflare Workers）
 
-18 个常用 TG Bot，**每个都是一个独立的 `worker.js` 单文件**：复制粘贴（或拖拽）到 Cloudflare Worker 即可部署，零依赖、零服务器、跑在 Workers 免费额度里。一个 Bot 用一个 Worker、一个 Bot Token，互不干扰，各从其类。
+24 个常用 TG Bot，**每个都是一个独立的 `worker.js` 单文件**：复制粘贴（或拖拽）到 Cloudflare Worker 即可部署，零依赖、零服务器、跑在 Workers 免费额度里。一个 Bot 用一个 Worker、一个 Bot Token，互不干扰，各从其类。
 
 ## 目录
 
@@ -24,6 +24,12 @@
 | 16 | 邀请引流统计 | [16-referral](16-referral/) | 深链+专属进群链接双归因，邀请榜（合规统计） | ✅ |
 | 17 | 任务赚钱 | [17-task-earn](17-task-earn/) | 发任务攒积分：加入类自动验证，兑换走审核 | ✅ |
 | 18 | 频道导航/互推 | [18-channel-directory](18-channel-directory/) | 频道自助提交审核收录，分类导航/搜索/随机 | ✅ |
+| 19 | 投票问卷 | [19-poll-vote](19-poll-vote/) | 按钮投票可改票/可匿名，截止公布结果 | ✅ |
+| 20 | 消息推送 API | [20-push-api](20-push-api/) | 给脚本/服务器一个发 TG 消息的网址接口（Server酱式） | 不用 |
+| 21 | 定时播报 | [21-scheduled-post](21-scheduled-post/) | 每天/每周固定时间自动发公告到频道/群 | ✅ |
+| 22 | 群活跃统计 | [22-group-stats](22-group-stats/) | 每日消息量/话痨榜/进退群，今日与近 7 天报表 | ✅ |
+| 23 | 行情播报 | [23-crypto-price](23-crypto-price/) | 币价查询+价格提醒+定时播报（Binance 公共行情） | 提醒需 |
+| 24 | 接龙报名 | [24-chain-signup](24-chain-signup/) | 群活动接龙：按钮报名排队名单，截止定版 | ✅ |
 
 每个目录里都有自己的 `README.md`（变量清单 + 注意事项）。
 
@@ -54,7 +60,7 @@
 
 - **Bot Token 只填进 Cloudflare 的 Secret 变量里，不要写进代码、不要发到聊天/群里。** 泄露后去 @BotFather 用 /revoke 重置。
 - `WEBHOOK_SECRET` 随便编一串长随机字符即可，它同时是 `/setWebhook` 的访问口令。
-- 无状态设计：01–05、07、08 不用任何数据库（靠消息转发/按钮里编码的坐标工作）；06、09、10、11、13、14、15、16、17、18 需要绑定一个 KV（12 仅答题模式需要）；KV 只存小数据（映射/名单/索引/账本），文件本体都在 Telegram 服务器上。
+- 无状态设计：01–05、07、08 不用任何数据库（靠消息转发/按钮里编码的坐标工作）；06、09、10、11、13、14、15、16、17、18、19、21、22、24 需要绑定一个 KV（12 仅答题模式、23 仅价格提醒需要，20 不用）；KV 只存小数据（映射/名单/索引/账本），文件本体都在 Telegram 服务器上。
 
 ## 组合玩法
 
