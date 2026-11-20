@@ -17,6 +17,10 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const admins = (env) => String(env.ADMIN_ID || "").split(",").map((s) => s.trim()).filter(Boolean);
 const isAdmin = (env, id) => admins(env).includes(String(id));
 
+// ============================================================
+// 【核心模块】Telegram Bot API 通信层
+// 统一封装 tg()：所有给 Telegram 发的请求都走这里，改 API 地址/加重试只改这一处。
+// ============================================================
 async function tg(env, method, payload) {
   const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
@@ -26,6 +30,10 @@ async function tg(env, method, payload) {
 const send = (env, chat_id, text, extra = {}) => tg(env, "sendMessage", { chat_id, text, ...extra });
 
 // 解析「文字 | https://链接」每行一个，返回 inline keyboard
+// ============================================================
+// 【核心模块】链接按钮解析
+// 把「文字 | https://链接」文本块解析成 inline 键盘，网页面板和 /post 共用。
+// ============================================================
 function parseButtons(block) {
   const rows = [];
   for (const line of String(block || "").split("\n")) {
@@ -35,6 +43,10 @@ function parseButtons(block) {
   return rows.length ? { inline_keyboard: rows } : undefined;
 }
 
+// ============================================================
+// 【核心模块】网页面板（发帖表单）
+// GET /panel 的 HTML 表单页；发布动作在入口路由的 /panel/publish 分支里。
+// ============================================================
 function panelHTML() {
   return `<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>频道发帖面板</title><style>body{font-family:system-ui;max-width:640px;margin:24px auto;padding:0 16px;background:#111;color:#eee}
@@ -48,6 +60,10 @@ button{background:#c9a227;color:#111;border:0;padding:12px 20px;border-radius:8p
 </form></body></html>`;
 }
 
+// ============================================================
+// 【核心模块】Worker 入口与路由
+// 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
+// ============================================================
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -87,6 +103,10 @@ export default {
   },
 };
 
+// ============================================================
+// 【核心模块】业务主流程
+// 发帖业务主流程（预览→发布 / /post 带按钮发帖 / 按钮回调）。这是本 Bot 真正干活的地方，其余都是它的地基。
+// ============================================================
 async function handle(env, update) {
   // 按钮回调：发布 / 发布并置顶
   const cq = update.callback_query;
