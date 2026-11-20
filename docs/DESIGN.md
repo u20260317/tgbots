@@ -6,7 +6,7 @@ tgbots 的整体设计：30 个单文件 Telegram Bot 模板 + 3 个拼装组合
 每个 worker.js 都是同一副骨架，这是能「像积木一样拼装」的前提：
 1. **配置层**：全部走环境变量——BOT_TOKEN（Secret）、WEBHOOK_SECRET、ADMIN_ID、业务变量（频道 ID、KV 绑定名 BOT_KV 等）；少数内容型配置（如 07 的菜单、14 的套餐、26 的题库）放代码顶部 CONFIG 区，改完重新部署即生效。
 2. **通信层**【核心模块】：唯一的 tg() 函数封装 Bot API 的 POST JSON 调用，全文件所有 Telegram 请求都走它。
-3. **入口路由**【核心模块】：fetch 处理 `/`（健康检查）、`/setWebhook?key=`（一键挂载，密钥校验；同时调 setMyCommands 把该 Bot 的 COMMANDS 命令表注册到输入框官方菜单，部署即生效）、`/webhook`（校验 secret_token 头后 ctx.waitUntil 异步处理，立即回 200）；需要定时的 Bot 另有 scheduled() 入口。每个模板顶部都有自己的 COMMANDS 常量（只列代码里真实存在的命令），这是模板标配，不需要部署者再去 BotFather 手工设置。
+3. **入口路由**【核心模块】：fetch 处理 `/`（健康检查）、`/setWebhook?key=`（一键挂载，密钥校验；同时调 setMyCommands 把该 Bot 的 COMMANDS 命令表注册到输入框官方菜单，部署即生效）、`/webhook`（校验 secret_token 头后 ctx.waitUntil 异步处理，立即回 200）；需要定时的 Bot 另有 scheduled() 入口。每个模板顶部都有自己的命令表（只列代码里真实存在的命令），这是模板标配，不需要部署者再去 BotFather 手工设置。命令表分两级（模块名「管理员白名单与分级命令菜单」，注释里有详细说明）：COMMANDS_USER 默认 scope 所有人可见；COMMANDS_ADMIN 只对 ADMIN_ID 白名单里的管理员用 scope=chat 单独注册，非管理员的菜单里看不到——但隐藏只是体验层，真正的拦截仍靠业务里的 isAdmin 校验，两层缺一不可。
 4. **业务主流程**【核心模块】：handle() 按更新类型分发——私聊命令 / 群消息 / callback_query 按钮 / chat_join_request / chat_member，各 Bot 在这一层差异化。
 
 ## 2. 模块化与拼装规则
