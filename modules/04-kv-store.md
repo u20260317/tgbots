@@ -38,7 +38,7 @@ async function topRows() {
 
 ## 键命名注册表（拼装防冲突）
 
-`f:` 文件分享（06）· `index` 网盘目录（10）· `subs` 订阅者（09）· `pts:` 积分（13）· `lot:` 抽奖（13）· `order:`/`sub:` 订单与会员（14/15）· `prod:` 商品（15）· `ref:`/`refdone:` 邀请（16）· `task:`/`done:`/`claim:`/`exch:` 任务（17）· `dir:` 频道目录（18）· `poll:` 投票（19）· `jobs` 定时任务（21）· `stats:` 群统计（22）· `alerts` 价格提醒（23）· `chain:` 接龙（24）· `ledger:` 账本（25）· `quiz:`/`quizpts:` 竞答（26）· `msgmap:`/`boxsess:` 匿名信箱（29）· `ticket:`/`userticket:`/`tmap:` 工单（30）· `rss_state` RSS 去重（11）
+`f:` 文件分享（06）· `index` 网盘目录（10）· `subs` 订阅者（09）· `pts:` 积分（13）· `lot:` 抽奖（13）· `order:`/`sub:` 订单与会员（14/15）· `prod:` 商品（15）· `ref:`/`refdone:` 邀请（16）· `task:`/`done:`/`claim:`/`exch:` 任务（17）· `dir:` 频道目录（18）· `poll:` 投票（19）· `jobs` 定时任务（21）· `stats:` 群统计（22）· `alerts` 价格提醒（23）· `chain:` 接龙（24）· `ledger:` 账本（25）· `quiz:`/`quizpts:` 竞答（26）· `msgmap:`/`boxsess:` 匿名信箱（29）· `ticket:`/`userticket:`/`tmap:` 工单（30）· `rss_state` RSS 去重（11） · `fsm:` 向导状态（20） · `bot:` 租户记录（21） · `t:<botId>:` 租户数据前缀（21） · `cart:` 购物车（22） · `paid:` Stars 支付幂等（24） · `ai:` AI 对话上下文/用量（25） · `lang:` 语言覆盖（29） · `stt:` 群转写开关（30） · `autotr:` 群自动翻译（31） · `fban:` 联邦封禁（33） · `note:` 群笔记（33） · `filter:` 群过滤器（33） · `rem:` 个人提醒（34） · `todo:` 待办清单（34）
 
 ## 注意点
 
