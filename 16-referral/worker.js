@@ -140,7 +140,7 @@ export default {
       const r = await tg(env, "setWebhook", {
         url: hook,
         secret_token: env.WEBHOOK_SECRET,
-        allowed_updates: ["message", "chat_member"],
+        allowed_updates: ["message", "chat_member", "callback_query"],
       });
       const cm = await registerCommands(env);
       return Response.json({ setWebhook: hook, telegram: r, commands: cm });
@@ -172,6 +172,61 @@ async function handle(env, update) {
         m.chat.id,
         "⚠️ 本 Bot 需要先绑定 KV（变量名 BOT_KV），还没配置好。",
       );
+    return;
+  }
+
+  // ---------- 邀请榜分页（/topinv 与翻页按钮共用） ----------
+  // 每页 10 条；翻页按钮回调 topinv:<页码>，页码指示按钮是 topinv:noop（点了无动作）。
+  const TOP_PAGE = 10;
+  async function topInvRows() {
+    const list = await env.BOT_KV.list({ prefix: "ref:", limit: 1000 });
+    const rows = [];
+    for (const k of list.keys) {
+      if (k.name.startsWith("refdone:")) continue;
+      const raw = await env.BOT_KV.get(k.name);
+      if (raw) {
+        const r = JSON.parse(raw);
+        rows.push({ name: r.name || k.name.slice(4), count: r.count });
+      }
+    }
+    rows.sort((a, b) => b.count - a.count);
+    return rows;
+  }
+  function topInvView(rows, page) {
+    const pages = Math.max(1, Math.ceil(rows.length / TOP_PAGE));
+    const p = Math.min(Math.max(0, page), pages - 1);
+    const text =
+      "🏆 邀请榜\n\n" +
+      rows
+        .slice(p * TOP_PAGE, p * TOP_PAGE + TOP_PAGE)
+        .map((r, i) => `${p * TOP_PAGE + i + 1}. ${r.name} — ${r.count} 人`)
+        .join("\n");
+    if (pages <= 1) return { text };
+    const nav = [];
+    if (p > 0)
+      nav.push({ text: "⬅️ 上一页", callback_data: `topinv:${p - 1}` });
+    nav.push({ text: `${p + 1}/${pages}`, callback_data: "topinv:noop" });
+    if (p < pages - 1)
+      nav.push({ text: "下一页 ➡️", callback_data: `topinv:${p + 1}` });
+    return { text, reply_markup: { inline_keyboard: [nav] } };
+  }
+
+  // ---------- 邀请榜翻页按钮 ----------
+  const cq = update.callback_query;
+  if (cq) {
+    if (String(cq.data || "").startsWith("topinv:")) {
+      if (cq.data === "topinv:noop")
+        return tg(env, "answerCallbackQuery", { callback_query_id: cq.id });
+      const rows = await topInvRows();
+      const v = topInvView(rows, parseInt(cq.data.slice(7), 10) || 0);
+      await tg(env, "answerCallbackQuery", { callback_query_id: cq.id });
+      return tg(env, "editMessageText", {
+        chat_id: cq.message.chat.id,
+        message_id: cq.message.message_id,
+        text: v.text,
+        ...(v.reply_markup ? { reply_markup: v.reply_markup } : {}),
+      });
+    }
     return;
   }
 
@@ -227,27 +282,15 @@ async function handle(env, update) {
   }
 
   if (cmd === "/topinv") {
-    const list = await env.BOT_KV.list({ prefix: "ref:", limit: 1000 });
-    const rows = [];
-    for (const k of list.keys) {
-      if (k.name.startsWith("refdone:")) continue;
-      const raw = await env.BOT_KV.get(k.name);
-      if (raw) {
-        const r = JSON.parse(raw);
-        rows.push({ name: r.name || k.name.slice(4), count: r.count });
-      }
-    }
-    rows.sort((a, b) => b.count - a.count);
+    const rows = await topInvRows();
     if (!rows.length)
       return send(env, chatId, "还没有邀请记录，发 /invite 开始拉新。");
+    const v = topInvView(rows, 0);
     return send(
       env,
       chatId,
-      "🏆 邀请榜 Top 10\n\n" +
-        rows
-          .slice(0, 10)
-          .map((r, i) => `${i + 1}. ${r.name} — ${r.count} 人`)
-          .join("\n"),
+      v.text,
+      v.reply_markup ? { reply_markup: v.reply_markup } : {},
     );
   }
 
