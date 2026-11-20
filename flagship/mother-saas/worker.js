@@ -525,8 +525,8 @@ return r;
 // ============================================================
 function tierSection(tier, title, badge) {
 const rows = CATALOG.filter((c) => c[2] === tier);
-return `<h2>${esc(title)} <span class="badge">${esc(badge)}</span></h2><div class="grid">` +
-rows.map((c) => `<div class="card"><b>${String(c[0]).padStart(2, "0")} · ${esc(c[1])}</b><p>${esc(c[3])}</p></div>`).join("") + `</div>`;
+return `<h2 id="tier-${tier}">${esc(title)} <span class="badge">${esc(badge)}</span></h2><div class="grid">` +
+rows.map((c) => `<div class="card tcard" data-tier="${tier}" data-name="${esc(c[1])}"><b>${String(c[0]).padStart(2, "0")} · ${esc(c[1])}</b><p>${esc(c[3])}</p></div>`).join("") + `</div>`;
 }
 async function renderPanel(env) {
 const stats = await platformStats(env).catch(() => null);
@@ -534,9 +534,9 @@ const tenants = stats? (await listTenantsRaw(env, null)).map(sanitizeTenant): []
 const cc = catalogCounts();
 const health = stats?.health || { status: "degraded", kv: false, botTokenConfigured: false, encKeyConfigured: false};
 const kernelCards = Object.entries(KERNELS_META).map(([key, v]) =>
-`<div class="card gold"><b>${esc(v.name)}</b><span class="badge">已可入驻</span><p>源模板 ${String(v.templateNo).padStart(2, "0")} · 内核键 <code>${esc(key)}</code></p><p>${esc(v.desc)}</p></div>`).join("");
+`<div class="card gold kcard" data-kernel="${esc(key)}" title="点击查看入驻步骤"><b>${esc(v.name)}</b><span class="badge">已可入驻</span><p>源模板 ${String(v.templateNo).padStart(2, "0")} · 内核键 <code>${esc(key)}</code></p><p>${esc(v.desc)}</p><p class="muted">👆 点这张卡看怎么入驻</p></div>`).join("");
 const tenantRows = tenants.length
-? tenants.map((t) => `<tr><td>@${esc(t.username || "-")}</td><td>${esc(t.kernel)}</td><td>${esc(t.slug)}</td><td>${esc(String(t.owner))}</td><td>${t.stopped? "⏸️ 已停用/熔断": "✅ 运行中"}</td><td>${t.at? new Date(t.at).toISOString().slice(0, 10): "-"}</td></tr>`).join("")
+? tenants.map((t) => `<tr><td>${t.username? `<a href="https://t.me/${esc(t.username)}" target="_blank" rel="noopener">@${esc(t.username)}</a>`: "-"}</td><td>${esc(t.kernel)}</td><td><code>${esc(t.slug)}</code> <button class="mini" data-copy="${esc(t.slug)}">复制</button></td><td>${esc(String(t.owner))}</td><td>${t.stopped? "⏸️ 已停用/熔断": "✅ 运行中"}</td><td>${t.at? new Date(t.at).toISOString().slice(0, 10): "-"}</td></tr>`).join("")
 : `<tr><td colspan="6" class="muted">暂无租户 — 在母体 Bot 里发 /new 完成第一个入驻后，这里会显示脱敏列表。</td></tr>`;
 const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>母体 SaaS · 平台面板</title><style>
@@ -547,8 +547,22 @@ body{margin:0;background:#f7f2e7;color:#2b2620;font-family:Georgia,"Songti SC","
 .stat b{font-size:26px;display:block}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}.card p{margin:6px 0 0;color:#5c5344;font-size:14px;line-height:1.5}
 .card.gold{border-color:#b9975b}table{width:100%;border-collapse:collapse;background:#fffdf6}th,td{border:1px solid #ddd2b8;padding:8px;text-align:left;font-size:14px}
 code{background:#efe6cf;padding:1px 5px;border-radius:4px}a{color:#8a6d2f}
+.btn{display:inline-block;background:#b9975b;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:14px;cursor:pointer;text-decoration:none;margin:0 6px 6px 0}
+.btn.alt{background:#fffdf6;color:#8a6d2f;border:1px solid #b9975b}.btn.on{background:#2b2620}
+.mini{background:#efe6cf;border:1px solid #b9975b;border-radius:6px;padding:1px 8px;cursor:pointer;font-size:12px}
+.kcard{cursor:pointer}.kcard:hover{box-shadow:0 2px 10px rgba(185,151,91,.35)}
+input[type=search]{padding:8px 10px;border:1px solid #ddd2b8;border-radius:8px;font-size:14px;min-width:220px;background:#fffdf6}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#2b2620;color:#f7f2e7;padding:10px 18px;border-radius:10px;font-size:14px;display:none;max-width:88vw;line-height:1.6;z-index:9}
 </style></head><body><div class="wrap">
 <h1>🏭 母体 SaaS — 平台面板</h1>
+<div style="margin:10px 0 2px">
+<a class="btn" href="https://t.me/dododotest_bot" target="_blank" rel="noopener">🤖 打开母体 Bot 入驻</a>
+<button class="btn alt" id="btn-refresh">↻ 刷新数据</button>
+<a class="btn alt" href="#tenants">租户列表</a>
+<a class="btn alt" href="#catalog">模板目录</a>
+<span class="muted" id="upd"></span>
+</div>
+<div id="kdetail" class="card gold" style="display:none;margin-top:10px"></div>
 <div class="muted">一个母体平台 · 82 个模板目录 · 状态：<b>${esc(health.status)}</b>（KV ${health.kv? "✅": "❌"} / BOT_TOKEN ${health.botTokenConfigured? "✅": "❌"} / TOKEN_ENC_KEY ${health.encKeyConfigured? "✅": "❌"}）</div>
 <div class="goldline"></div>
 <div class="stats">
@@ -559,14 +573,58 @@ code{background:#efe6cf;padding:1px 5px;border-radius:4px}a{color:#8a6d2f}
 <div class="stat"><span>目录模板总数</span><b>${cc.total}</b></div>
 </div>
 <h2>已可入驻内核 <span class="badge">v1 真实可用 · ${cc.live} 个</span></h2><div class="grid">${kernelCards}</div>
-<h2>租户列表 <span class="badge">已脱敏 · 不显示 Token/密文</span></h2>
+<h2 id="tenants">租户列表 <span class="badge">已脱敏 · 不显示 Token/密文</span></h2>
 <table><tr><th>子 Bot</th><th>内核</th><th>slug</th><th>店主 ID</th><th>状态</th><th>入驻日期</th></tr>${tenantRows}</table>
 <p class="muted">机器接口：<a href="/api/stats">/api/stats</a> · <a href="/api/tenants">/api/tenants</a>（均脱敏）</p>
+<h2 id="catalog">模板目录筛选</h2>
+<div style="margin-bottom:8px">
+<button class="btn on" data-filter="all">全部 ${cc.total}</button>
+<button class="btn alt" data-filter="live">一档 已可入驻 ${cc.live}</button>
+<button class="btn alt" data-filter="adapt">二档 可适配 ${cc.adapt}</button>
+<button class="btn alt" data-filter="no">三档 不适合托管 ${cc.no}</button>
+<input type="search" id="q" placeholder="🔍 搜模板名，如：签到 / 客服 / 监控">
+<span class="muted" id="shown"></span>
+</div>
 ${tierSection("live", "82 模板目录 · 一档：已可入驻", cc.live + " 个")}
 ${tierSection("adapt", "82 模板目录 · 二档：可适配", cc.adapt + " 个 · 需 scopedKV/config 适配后才能入驻，v1 尚未上线")}
 ${tierSection("no", "82 模板目录 · 三档：不适合托管", cc.no + " 个 · 需独立 Cron/密钥/群管理员/支付，或母体本身")}
 <p class="muted">安全：子 Bot Token 只以 AES-GCM 密文存 KV；面板与 API 永不返回 Token、密文与租户 secret。用户可随时去 @BotFather /revoke 退出托管。</p>
-</div></body></html>`;
+</div><div id="toast"></div>
+<script>
+var KSTEPS = {};
+document.querySelectorAll(".kcard").forEach(function(el){ KSTEPS[el.dataset.kernel] = el.querySelector("b").textContent; });
+function toast(msg){ var t=document.getElementById("toast"); t.innerHTML=msg; t.style.display="block"; clearTimeout(t._h); t._h=setTimeout(function(){t.style.display="none"},6000); }
+document.querySelectorAll(".kcard").forEach(function(el){ el.addEventListener("click", function(){
+  var d=document.getElementById("kdetail"); d.style.display="block";
+  d.innerHTML="<b>入驻「"+el.querySelector("b").textContent+"」的步骤</b><p>1）点上方「打开母体 Bot 入驻」<br>2）在 Bot 里发 /new，选这个内核<br>3）把你在 @BotFather 建的新 Bot 的 Token 发给母体，确认后子 Bot 立即上线<br>4）回到本面板点「刷新数据」就能看到新租户</p>";
+  d.scrollIntoView({behavior:"smooth", block:"center"});
+});});
+document.querySelectorAll("[data-copy]").forEach(function(b){ b.addEventListener("click", function(){ navigator.clipboard && navigator.clipboard.writeText(b.dataset.copy); toast("已复制 slug："+b.dataset.copy); }); });
+var curFilter="all";
+function applyFilter(){
+  var q=(document.getElementById("q").value||"").trim();
+  var shown=0;
+  document.querySelectorAll(".tcard").forEach(function(c){
+    var ok=(curFilter==="all"||c.dataset.tier===curFilter) && (!q||c.dataset.name.indexOf(q)>=0);
+    c.style.display=ok?"":"none"; if(ok) shown++;
+  });
+  ["live","adapt","no"].forEach(function(tier){
+    var sec=document.getElementById("tier-"+tier); if(!sec) return;
+    var any=false; document.querySelectorAll('.tcard[data-tier="'+tier+'"]').forEach(function(c){ if(c.style.display!=="none") any=true; });
+    sec.style.display=any?"":"none"; var grid=sec.nextElementSibling; if(grid) grid.style.display=any?"":"none";
+  });
+  document.getElementById("shown").textContent="当前显示 "+shown+" 个";
+}
+document.querySelectorAll("[data-filter]").forEach(function(b){ b.addEventListener("click", function(){
+  curFilter=b.dataset.filter;
+  document.querySelectorAll("[data-filter]").forEach(function(x){ x.className="btn alt"; });
+  b.className="btn on"; applyFilter();
+});});
+document.getElementById("q").addEventListener("input", applyFilter);
+document.getElementById("btn-refresh").addEventListener("click", function(){ location.reload(); });
+applyFilter();
+</script>
+</body></html>`;
 return new Response(html, { headers: { "content-type": "text/html;charset=utf-8"}});
 }
 
