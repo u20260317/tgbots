@@ -164,6 +164,13 @@ async function runPush(env) {
 // 【核心模块】Worker 入口与路由
 // fetch 管 Bot 命令与手动触发，scheduled 管 Cron 定时触发，两条路都汇到 runPush。
 // ============================================================
+// ---------- Bot 命令菜单（部署时 /setWebhook 自动注册到输入框菜单） ----------
+const COMMANDS = [
+  { command: "pushnow", description: "立即抓取一轮（管理员）" },
+  { command: "status", description: "订阅源状态（管理员）" },
+  { command: "start", description: "使用说明" },
+];
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -185,7 +192,8 @@ export default {
         secret_token: env.WEBHOOK_SECRET,
         allowed_updates: ["message"],
       });
-      return Response.json({ setWebhook: hook, telegram: r });
+      const cm = await tg(env, "setMyCommands", { commands: COMMANDS });
+      return Response.json({ setWebhook: hook, telegram: r, commands: cm });
     }
     if (url.pathname === "/push") {
       if (
