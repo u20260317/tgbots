@@ -138,6 +138,14 @@ async function finishSession(env, chatId, s, reason) {
 // 【核心模块】Worker 入口与路由
 // 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
 // ============================================================
+// ---------- Bot 命令菜单（部署时 /setWebhook 自动注册到输入框菜单） ----------
+const COMMANDS = [
+  { command: "quiz", description: "开始竞答" },
+  { command: "stopquiz", description: "结束本场竞答" },
+  { command: "quiztop", description: "竞答总榜" },
+  { command: "start", description: "使用说明" },
+];
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -159,7 +167,8 @@ export default {
         secret_token: env.WEBHOOK_SECRET,
         allowed_updates: ["message", "callback_query"],
       });
-      return Response.json({ setWebhook: hook, telegram: r });
+      const cm = await tg(env, "setMyCommands", { commands: COMMANDS });
+      return Response.json({ setWebhook: hook, telegram: r, commands: cm });
     }
     if (url.pathname !== "/webhook" || request.method !== "POST")
       return new Response("not found", { status: 404 });
