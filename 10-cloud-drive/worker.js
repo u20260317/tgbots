@@ -29,6 +29,10 @@
 
 const owners = (env) => String(env.ADMIN_ID || "").split(",").map((s) => s.trim()).filter(Boolean);
 const isOwner = (env, id) => owners(env).includes(String(id));
+// ============================================================
+// 【核心模块】Telegram Bot API 通信层
+// 统一封装 tg()：所有给 Telegram 发的请求都走这里，改 API 地址/加重试只改这一处。
+// ============================================================
 async function tg(env, method, payload) {
   const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
@@ -41,10 +45,18 @@ const fmtSize = (n) => !n ? "" : n > 1048576 ? (n / 1048576).toFixed(1) + " MB" 
 const fmtDate = (ts) => new Date(ts).toISOString().slice(0, 10);
 
 // ---------- 索引（KV 键 index：数组；单项 {c:短码, n:名, k:类型, s:大小, m:存储消息ID, cap:说明, tag:标签, t:时间}） ----------
+// ============================================================
+// 【核心模块】目录索引存储（KV）
+// 网盘目录存 KV 的 index 键（文件名/类型/大小/存储消息 ID）；文件本体在私有频道，不在这里。
+// ============================================================
 async function loadIndex(env) { const raw = await env.BOT_KV.get("index"); return raw ? JSON.parse(raw) : []; }
 async function saveIndex(env, idx) { await env.BOT_KV.put("index", JSON.stringify(idx)); }
 const findByCode = (idx, code) => idx.find((x) => x.c === code);
 
+// ============================================================
+// 【核心模块】文件类型识别
+// 识别发来的文件类型、名称与大小，用于登记目录。
+// ============================================================
 function fileOf(msg) {
   if (msg.document) return { kind: "document", name: msg.document.file_name || "未命名文件", size: msg.document.file_size || 0 };
   if (msg.photo?.length) return { kind: "photo", name: "图片 " + fmtDate(Date.now()), size: msg.photo[msg.photo.length - 1].file_size || 0 };
@@ -69,6 +81,10 @@ function entryKeyboard(e) {
   ]] };
 }
 
+// ============================================================
+// 【核心模块】Worker 入口与路由
+// 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
+// ============================================================
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -89,12 +105,20 @@ export default {
   },
 };
 
+// ============================================================
+// 【核心模块】文件取回
+// 按目录里的存储消息 ID，用 copyMessage 把私有频道里的原件复制发给请求者。
+// ============================================================
 async function retrieve(env, chatId, e) {
   const r = await tg(env, "copyMessage", { chat_id: chatId, from_chat_id: env.STORAGE_CHANNEL_ID, message_id: e.m });
   if (!r.ok) await send(env, chatId, "⚠️ 取回失败：" + (r.description || "存储频道里的原文件可能已被删除"));
   return r.ok;
 }
 
+// ============================================================
+// 【核心模块】业务主流程
+// 网盘业务主流程（转存私有频道、目录管理、分享取件）。这是本 Bot 真正干活的地方，其余都是它的地基。
+// ============================================================
 async function handle(env, update) {
   // ---------- 按钮 ----------
   const cq = update.callback_query;
