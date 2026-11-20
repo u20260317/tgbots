@@ -83,5 +83,11 @@ function topView(rows, page) {
 | `shop:` / `cart:` | 商店导航 / 购物车操作 | 22 |
 | `rem:` | 待办勾选（rem:done:<id>） | 34 |
 | `ai:` | AI 人设/清空类按钮（预留） | 25 |
+| `wolf:` | 狼人杀行动（join/kill/check/save/poison/vote） | 35 |
+| `pmedia:` | 付费媒体购买/查看（buy/view） | 42 |
+| `mb:` | 母体入驻向导/租户管理 | 模板 32 |
+| `mall:` | 商城开店向导/店铺管理 | 模板 33 |
+| `dl:` | 下载画质选择 | 模板 34 |
+| `stk:` | 贴纸 emoji 选择 | 模板 37 |
 
 新拼模块时先查这张表，前缀不撞就能共存；完整拼装规则见 [docs/ASSEMBLY.md](../docs/ASSEMBLY.md)。
