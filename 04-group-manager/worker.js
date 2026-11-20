@@ -14,6 +14,10 @@
 // 部署后访问 https://你的Worker地址/setWebhook?key=你的WEBHOOK_SECRET
 // ============================================================
 
+// ============================================================
+// 【核心模块】Telegram Bot API 通信层
+// 统一封装 tg()：所有给 Telegram 发的请求都走这里，改 API 地址/加重试只改这一处。
+// ============================================================
 async function tg(env, method, payload) {
   const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
@@ -24,11 +28,19 @@ const send = (env, chat_id, text, extra = {}) => tg(env, "sendMessage", { chat_i
 const NO_PERMS = { can_send_messages: false, can_send_media_messages: false, can_send_other_messages: false, can_add_web_page_previews: false };
 const FULL_PERMS = { can_send_messages: true, can_send_media_messages: true, can_send_polls: true, can_send_other_messages: true, can_add_web_page_previews: true, can_invite_users: true };
 
+// ============================================================
+// 【核心模块】群管理员权限判定
+// 查成员角色决定命令权限与过滤豁免，管理员命令和防链接都先过这里。
+// ============================================================
 async function isGroupAdmin(env, chatId, userId) {
   const r = await tg(env, "getChatMember", { chat_id: chatId, user_id: userId });
   return ["administrator", "creator"].includes(r?.result?.status);
 }
 
+// ============================================================
+// 【核心模块】Worker 入口与路由
+// 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
+// ============================================================
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -49,6 +61,10 @@ export default {
   },
 };
 
+// ============================================================
+// 【核心模块】业务主流程
+// 群管理业务主流程（新人验证、内容过滤、管理员命令）。这是本 Bot 真正干活的地方，其余都是它的地基。
+// ============================================================
 async function handle(env, update) {
   // 新人验证按钮
   const cq = update.callback_query;
