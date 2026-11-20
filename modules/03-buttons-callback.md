@@ -90,5 +90,24 @@ function topView(rows, page) {
 | `dl:` | 下载画质选择 | 模板 34 |
 | `stk:` | 贴纸 emoji 选择 | 模板 37 |
 | `pdf:` | PDF 拼装/清空（make/clear） | 模板 49 |
+| `report:` / `ach:` | 匿名聊天举报/确认/换人/断开 | 模板 52 |
+| `mgb:` | Managed 子 Bot 管理（rotate/revoke） | 模板 54 |
+| `aimg:` | 绘图重新生成 | 模板 55 |
+| `lesson:` | 课程开课/测验/下一课 | 模板 56 |
+| `bk:` / `bok:` / `bno:` | 预约流与管理员确认/拒绝 | 模板 57 |
+| `fc:` | 闪卡翻面/评分/删卡 | 模板 58 |
+| `snap:` | 监控列表删除 | 模板 60 |
+| `gw:` | 抽奖参与 | 模板 61 |
+| `cp:` | Crypto Pay 发票状态刷新 | 模板 62 |
+| `radio:` | 电台点播 | 模板 65 |
+| `jobok:` / `jobno:` | 职位审核通过/拒绝 | 模板 69 |
+| `astro:` / `tarot:` | 星座选择/塔罗抽牌 | 模板 71 |
+| `verse:faith:` / `book:` / `shelf:del:` | 经文选库/书库取书/书架删除 | 模板 72 / 73 |
+| `dao:un:` / `nft:un:` / `price:del:` / `dom:del:` | 各类订阅退订/删除 | 模板 74 / 75 / 76 / 81 |
+| `date:` | 交友建卡/喜欢/跳过/举报 | 模板 77 |
+| `vpn:plan:` / `vpn:ok:` / `vpn:no:` | VPN 套餐/确认/拒绝 | 模板 78 |
+| `habit:do:` / `habit:del:` / `pomo:x:` | 习惯打卡/删除、番茄取消 | 模板 79 |
+| `ask:ok:` / `ask:no:` | 提问墙审核 | 模板 80 |
+| `avatar:style:` / `avatar:id:` | 头像风格/证件照规格 | 模板 82 |
 
 新拼模块时先查这张表，前缀不撞就能共存；完整拼装规则见 [docs/ASSEMBLY.md](../docs/ASSEMBLY.md)。
