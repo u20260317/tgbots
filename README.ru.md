@@ -1,14 +1,31 @@
+<div align="center">
+
+<img src="assets/banner.png" alt="tgbots" width="100%">
+
 # 🧩 tgbots · Однофайловые шаблоны Telegram-ботов
 
 [中文](README.md) | [English](README.en.md) | **Русский**
 
-[![Stars](https://img.shields.io/github/stars/u20260317/tgbots?style=flat-square)](https://github.com/u20260317/tgbots/stargazers)
-[![Forks](https://img.shields.io/github/forks/u20260317/tgbots?style=flat-square)](https://github.com/u20260317/tgbots/forks)
-[![Last commit](https://img.shields.io/github/last-commit/u20260317/tgbots?style=flat-square)](https://github.com/u20260317/tgbots/commits/main)
-[![License](https://img.shields.io/github/license/u20260317/tgbots?style=flat-square)](LICENSE)
-![Language](https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square)
+<p>
+<a href="https://github.com/u20260317/tgbots/stargazers"><img src="https://img.shields.io/github/stars/u20260317/tgbots?style=flat-square" alt="Stars"></a>
+<a href="https://github.com/u20260317/tgbots/forks"><img src="https://img.shields.io/github/forks/u20260317/tgbots?style=flat-square" alt="Forks"></a>
+<a href="https://github.com/u20260317/tgbots/commits/main"><img src="https://img.shields.io/github/last-commit/u20260317/tgbots?style=flat-square" alt="Last commit"></a>
+<a href="LICENSE"><img src="https://img.shields.io/github/license/u20260317/tgbots?style=flat-square" alt="License"></a>
+<img src="https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square" alt="Language">
+</p>
 
 **30 повседневных Telegram-ботов, каждый — один самостоятельный файл `worker.js`**: скопируйте в Cloudflare Worker и деплойте — ноль зависимостей, ноль серверов, работает на бесплатном тарифе Workers. Плюс **34 модульных документа**, разбирающих типовые возможности на «кубики», из которых можно собрать своего бота.
+
+<p>
+<a href="#-шаблоны">📚 Шаблоны</a> ·
+<a href="modules/README.md">🧩 Модули</a> ·
+<a href="docs/knowledge/README.md">📖 База знаний</a> ·
+<a href="docs/DEPLOY.md">🚀 Деплой</a> ·
+<a href="docs/ASSEMBLY.md">🔧 Сборка</a> ·
+<a href="docs/TESTING.md">🧪 Тесты</a>
+</p>
+
+</div>
 
 ## ✨ Особенности
 
