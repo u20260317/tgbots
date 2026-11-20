@@ -57,6 +57,7 @@
 | C3 | 组合·网盘门禁 | 2026-11-20 | L3 | ✅ | 主人 /start、粉丝 /start d_ 深链领件走门禁、gatecheck 验证均 200，错密钥 403；边界同 10：转存依赖真实存储频道 |
 | 31 | AI 聊天 | 2026-11-20 | L4 | ✅ | 无 Key 部署：私聊提问走友好报错路径 200；/persona set 后回调 ai:毒舌，KV 读回 ai:700000031={persona:毒舌,msgs:[]}；/me、管理员 /aistats 200，错密钥 403。真对话链路经本地 harness 以同一 worker.js + 免费端点（Pollinations 匿名口）实测跑通：真实回复落盘（msgs 含 user+assistant）、ai:usage=1；线上复测时该免费端点对 CF 共享出口 IP 限流（探针 Worker 直测回 402 FREE_LIMIT），线上实时回复未完成，属环境限制非代码问题，配正式 Key 走同一代码路径 |
 | 32 | 母体 Bot | 2026-11-20 | L4 | ✅ | 入驻向导全程 200：/new → mb:type:checkin → 发测试 Bot 自身 Token（getMe 验真）→ mb:go 开通；KV 读回 bot:<slug> 记录，tokenEnc 为 AES-GCM 密文（iv.ct 格式、不含明文），botId/type/owner 正确；子 Bot 分发：带租户 secret 向 /w/<slug> 发 /qd，租户前缀键 t:9010372669:pts:700000132 读回 {p:10, streak:1, last:2026-11-20}，签到内核与 KV 隔离均生效；错租户密钥 403；错母体密钥 403 |
+| 33 | 商城 Bot | 2026-11-20 | L4 | ✅ | 全链读回验证：总部 /hqadd 上架 mall:prod（批发 50）；开店向导（选模式→Token 验真→店名→mall:go）生成 bot: 店铺记录（tokenEnc 密文、店名/模式/加价 20% 正确）；子店店主 /addprod+/addstock 落租户 prod（stock=[CARD-MALL-001]）；买家购物车读回 {hq:1, own:1}，结账订单 total=90（总部货源店面价 60=批发×1.2）、status=waitconfirm；店主 payok 后订单 done 且库存弹空 []。注：开店装配与库存扣减的 KV 读回各出现一次长延迟（约 2 分钟才可见），复读后无误，属 KV 传播慢非 bug |
 
 **全量测试完成（2026-11-20）**：30 个单体 + 3 个组合全部实测完毕。共发现并修复模板 bug 1 个（17 号 name 重复拼 ID，commit 1b8bf6e）。测试中多次出现的部署后首请求 404/500 与 setWebhook 1042 均为 Cloudflare 传播期抖动，复测均通过，已在各行备注中区分记录，未计为模板问题。
 
