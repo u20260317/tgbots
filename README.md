@@ -14,7 +14,7 @@
 <img src="https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square" alt="Language">
 </p>
 
-**51 个常用 Telegram Bot，每个都是一个独立的 `worker.js` 单文件**：复制粘贴到 Cloudflare Worker 即可部署——零依赖、零服务器、跑在 Workers 免费额度里。另有 **45 篇模块文档**把常用能力拆成积木，照着拼就能组出自己的 Bot。
+**82 个常用 Telegram Bot，每个都是一个独立的 `worker.js` 单文件**：复制粘贴到 Cloudflare Worker 即可部署——零依赖、零服务器、跑在 Workers 免费额度里。另有 **50 篇模块文档**把常用能力拆成积木，照着拼就能组出自己的 Bot。
 
 <p>
 <a href="#-模板目录">📚 模板目录</a> ·
@@ -105,6 +105,37 @@
 | 49 | PDF 工具 | [49-pdf-tools](49-pdf-tools/) | 图片本地拼 PDF、PDF 提文字、转图/合并/拆分走外部服务 | ✅ |
 | 50 | 音乐下载/识曲 | [50-music](50-music/) | 贴链接下音频、发片段 AudD 识曲，每日限额 | ✅ |
 | 51 | 游戏平台 | [51-game-platform](51-game-platform/) | Worker 自托管贪吃蛇/2048，sendGame 卡片+签名令牌记分 | 建议 |
+| 52 | 匿名随机聊天 | [52-anon-chat](52-anon-chat/) | 队列配对匿名聊天，举报自动封禁+敏感词+规则确认全套安全配套 | ✅ |
+| 53 | Business 代答 | [53-business-reply](53-business-reply/) | Telegram Business 账号代答：营业时间答疑、营业外留言转人工 | ✅ |
+| 54 | Managed Bots 母体 | [54-managed-bots](54-managed-bots/) | Bot API 9.6 深链建 Bot，getManagedBotToken 取 token 加密代管 | ✅ |
+| 55 | AI 绘图 | [55-ai-image](55-ai-image/) | /draw 文生图、/edit 改图，OpenAI images 兼容口径可换源 | 可选 |
+| 56 | 课程/LMS | [56-course-lms](56-course-lms/) | 建课加课时、顺序学习、测验解锁、付费人工确认 | ✅ |
+| 57 | 预约/订位 | [57-booking](57-booking/) | 服务/日期/时段三步预约，占用防撞+管理员确认+提前提醒 | ✅ |
+| 58 | 闪卡记忆 | [58-flashcards](58-flashcards/) | SM-2 间隔重复背卡，每日到期提醒，零外部 API | ✅ |
+| 59 | 长文总结 | [59-summarizer](59-summarizer/) | 链接/长文 LLM 总结，长文 map-reduce 分段摘要 | 无 |
+| 60 | 网站更新监控 | [60-web-monitor](60-web-monitor/) | 无 RSS 站点快照哈希比对，变化推行级 diff 摘要 | ✅ |
+| 61 | 活动抽奖 | [61-giveaway](61-giveaway/) | 按钮参与+订阅核验，定时/手动开奖，crypto 随机抽取 | ✅ |
+| 62 | 加密支付 | [62-crypto-pay](62-crypto-pay/) | Crypto Pay 发票收款，Webhook 验签+幂等发货 | ✅ |
+| 63 | 频道数据分析 | [63-channel-analytics](63-channel-analytics/) | 自有频道帖子采样统计+日报，深度数据留 TGStat 适配位 | ✅ |
+| 64 | TTS 语音合成 | [64-tts](64-tts/) | 文本转语音条，OpenAI speech 兼容口径，长文分段 | 可选 |
+| 65 | 电台/播客 | [65-radio-podcast](65-radio-podcast/) | 电台直播流导航+播客 RSS 订阅新单集推送 | ✅ |
+| 66 | 直播开播提醒 | [66-live-alert](66-live-alert/) | YouTube 免 key/Twitch Helix 订阅，开播状态翻转才推 | ✅ |
+| 67 | 包裹快递追踪 | [67-parcel-tracking](67-parcel-tracking/) | 17track 口径订阅追踪，轨迹变化推送、签收停追 | ✅ |
+| 68 | 机票/旅行助手 | [68-travel-assistant](68-travel-assistant/) | 航班查询适配、低价订阅、行程单起飞前提醒 | ✅ |
+| 69 | 求职招聘 | [69-job-board](69-job-board/) | 发岗审核上架、按城市搜索、投递转发企业 | ✅ |
+| 70 | 房产租售提醒 | [70-real-estate](70-real-estate/) | 订阅城市/户型/预算，新房源去重推送（数据源自接） | ✅ |
+| 71 | 星座运势/塔罗 | [71-horoscope](71-horoscope/) | 本地种子确定性每日运势+22 大阿卡纳抽牌，娱乐定位 | 可选 |
+| 72 | 每日经文 | [72-daily-verse](72-daily-verse/) | 公版译本经文轮换+礼拜时间查询+订阅推送 | ✅ |
+| 73 | 公版书库 | [73-gutenberg-library](73-gutenberg-library/) | Gutendex 免 key 搜书取书，只收公版书 | 可选 |
+| 74 | DAO 治理提醒 | [74-dao-alerts](74-dao-alerts/) | Snapshot 提案轮询，新提案/状态变化推送 | ✅ |
+| 75 | NFT 动态提醒 | [75-nft-alerts](75-nft-alerts/) | 合约事件轮询适配层，mint/成交推送 | ✅ |
+| 76 | 电商比价追踪 | [76-price-tracker](76-price-tracker/) | 商品链接订阅查价，降价超阈值推送+30 天价格史 | ✅ |
+| 77 | 相亲交友 | [77-dating-match](77-dating-match/) | 建卡浏览双向喜欢配对，18+ 确认+举报封禁安全配套 | ✅ |
+| 78 | VPN 面板交付 | [78-vpn-panel](78-vpn-panel/) | 收款后 Marzban/3X-UI 自动开号发订阅链接，到期禁用 | ✅ |
+| 79 | 习惯打卡/番茄钟 | [79-habit-pomodoro](79-habit-pomodoro/) | 习惯连续打卡统计+番茄钟到期提醒 | ✅ |
+| 80 | 匿名提问墙 | [80-anon-qa-wall](80-anon-qa-wall/) | 匿名提问上墙公开作答，身份永不进频道 | ✅ |
+| 81 | 域名/SSL 监控 | [81-domain-monitor](81-domain-monitor/) | RDAP 查到期+证书探针，30/7/1 天分级提醒 | ✅ |
+| 82 | AI 头像/证件照 | [82-ai-avatar](82-ai-avatar/) | AI 风格头像+证件照规格裁剪，隐私提示不落盘 | 可选 |
 
 
 每个目录里都有自己的 `README.md`（变量清单 + 注意事项）。
