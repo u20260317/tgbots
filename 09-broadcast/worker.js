@@ -13,6 +13,10 @@
 // ============================================================
 
 const admins = (env) => String(env.ADMIN_ID || "").split(",").map((s) => s.trim()).filter(Boolean);
+// ============================================================
+// 【核心模块】Telegram Bot API 通信层
+// 统一封装 tg()：所有给 Telegram 发的请求都走这里，改 API 地址/加重试只改这一处。
+// ============================================================
 async function tg(env, method, payload) {
   const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
@@ -22,12 +26,20 @@ async function tg(env, method, payload) {
 const send = (env, chat_id, text, extra = {}) => tg(env, "sendMessage", { chat_id, text, ...extra });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// ============================================================
+// 【核心模块】订阅名单存储（KV）
+// 订阅者 ID 列表存 KV 的 subs 键，订阅/退订/群发/清理失效名单都走这两个函数。
+// ============================================================
 async function subs(env) {
   const raw = await env.BOT_KV.get("subs");
   return raw ? JSON.parse(raw) : [];
 }
 async function saveSubs(env, list) { await env.BOT_KV.put("subs", JSON.stringify([...new Set(list)])); }
 
+// ============================================================
+// 【核心模块】Worker 入口与路由
+// 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
+// ============================================================
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -48,6 +60,10 @@ export default {
   },
 };
 
+// ============================================================
+// 【核心模块】业务主流程
+// 订阅群发业务主流程（订阅/退订名单维护、管理员群发）。这是本 Bot 真正干活的地方，其余都是它的地基。
+// ============================================================
 async function handle(env, update) {
   const msg = update.message;
   if (!msg || msg.chat.type !== "private") return;
