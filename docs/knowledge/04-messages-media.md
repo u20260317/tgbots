@@ -58,3 +58,4 @@
 - 文件识别与存储：[modules/08 文件存储](../../modules/08-file-store.md)、模板 06/10。
 - 发稿与复制语义：[modules/05 频道发帖](../../modules/05-channel-posting.md)。
 - 路由靠来源字段：[modules/07 转发与回复路由](../../modules/07-forward-routing.md)。
+- 付费媒体（sendPaidMedia）的购买与复看：[modules/42 付费媒体](../../modules/42-paid-media.md)；媒体类富交互的总览见 [14 富交互能力谱](14-games-rich-interaction.md)。
