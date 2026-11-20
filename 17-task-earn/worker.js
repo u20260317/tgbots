@@ -199,6 +199,8 @@ async function handle(env, update) {
       await putKV(env, "claim:" + claimId, {
         user: cq.from.id,
         name: who(cq.from),
+        fname: cq.from.first_name || "",
+        uname: cq.from.username || "",
         taskId: arg,
         title: task.title,
         points: task.points,
@@ -245,7 +247,11 @@ async function handle(env, update) {
         await env.BOT_KV.put(`done:${claim.user}:${claim.taskId}`, "1");
         const total = await award(
           env,
-          { id: claim.user, first_name: claim.name },
+          {
+            id: claim.user,
+            first_name: claim.fname ?? claim.name,
+            username: claim.uname || "",
+          },
           claim.points,
         );
         await send(
