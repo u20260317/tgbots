@@ -14,7 +14,7 @@
 <img src="https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square" alt="Language">
 </p>
 
-**51 everyday Telegram bots, each a single standalone `worker.js` file**: copy-paste into a Cloudflare Worker and deploy — zero dependencies, zero servers, runs on the Workers free tier. Plus **45 module docs** that break common capabilities into building blocks you can assemble into your own bot.
+**82 everyday Telegram bots, each a single standalone `worker.js` file**: copy-paste into a Cloudflare Worker and deploy — zero dependencies, zero servers, runs on the Workers free tier. Plus **50 module docs** that break common capabilities into building blocks you can assemble into your own bot.
 
 <p>
 <a href="#-templates">📚 Templates</a> ·
@@ -105,13 +105,44 @@ Step-by-step with screenshots, how to find every ID, how to bind KV, common erro
 | 49 | PDF Tools | [49-pdf-tools](49-pdf-tools/) | Images to PDF locally in pure JS; extract/convert via external services | ✅ |
 | 50 | Music | [50-music](50-music/) | Audio downloads via resolver, AudD song recognition, daily quota | ✅ |
 | 51 | Game Platform | [51-game-platform](51-game-platform/) | Worker-hosted Snake/2048, sendGame cards, signed-token scoring | Recommended |
+| 52 | Anonymous Random Chat | [52-anon-chat](52-anon-chat/) | Queue-matched anonymous chat with full safety kit: reports, auto-ban, word filter | ✅ |
+| 53 | Business Auto-Reply | [53-business-reply](53-business-reply/) | Telegram Business delegate: keyword answers in hours, messages forwarded off-hours | ✅ |
+| 54 | Managed Bots Host | [54-managed-bots](54-managed-bots/) | Bot API 9.6 deep-link bot creation, encrypted token custody via getManagedBotToken | ✅ |
+| 55 | AI Image | [55-ai-image](55-ai-image/) | /draw text-to-image, /edit image editing, OpenAI-images-compatible | Optional |
+| 56 | Courses / LMS | [56-course-lms](56-course-lms/) | Build courses, sequential lessons, quiz-gated progress, paid unlock | ✅ |
+| 57 | Booking | [57-booking](57-booking/) | Service/date/slot booking with collision-proof occupancy and reminders | ✅ |
+| 58 | Flashcards | [58-flashcards](58-flashcards/) | SM-2 spaced repetition, daily due reminders, zero external APIs | ✅ |
+| 59 | Summarizer | [59-summarizer](59-summarizer/) | LLM summaries of links/long texts, map-reduce for long articles | No |
+| 60 | Website Change Monitor | [60-web-monitor](60-web-monitor/) | Snapshot hash diffing for sites without RSS, line-level change digests | ✅ |
+| 61 | Giveaway | [61-giveaway](61-giveaway/) | Button entry + subscription checks, scheduled draws, crypto randomness | ✅ |
+| 62 | Crypto Pay | [62-crypto-pay](62-crypto-pay/) | Crypto Pay invoices, webhook signature verification, idempotent delivery | ✅ |
+| 63 | Channel Analytics | [63-channel-analytics](63-channel-analytics/) | Own-channel post sampling stats + daily report, TGStat adapter slot | ✅ |
+| 64 | TTS | [64-tts](64-tts/) | Text to voice messages, OpenAI speech-compatible, long-text chunking | Optional |
+| 65 | Radio / Podcasts | [65-radio-podcast](65-radio-podcast/) | Radio stream guide + podcast RSS subscriptions with new-episode push | ✅ |
+| 66 | Live Stream Alerts | [66-live-alert](66-live-alert/) | YouTube (keyless) / Twitch Helix subscriptions, alerts on state flips only | ✅ |
+| 67 | Parcel Tracking | [67-parcel-tracking](67-parcel-tracking/) | 17track subscriptions, tracking updates pushed, auto-stop on delivery | ✅ |
+| 68 | Travel Assistant | [68-travel-assistant](68-travel-assistant/) | Flight lookup adapter, fare-watch subscriptions, pre-flight reminders | ✅ |
+| 69 | Job Board | [69-job-board](69-job-board/) | Reviewed job postings, city search, applications forwarded to employers | ✅ |
+| 70 | Real Estate Alerts | [70-real-estate](70-real-estate/) | City/rooms/budget subscriptions, deduped new-listing push (bring your source) | ✅ |
+| 71 | Horoscope / Tarot | [71-horoscope](71-horoscope/) | Deterministic local daily horoscopes + 22 major arcana draws, entertainment | Optional |
+| 72 | Daily Verse | [72-daily-verse](72-daily-verse/) | Public-domain scripture rotation, prayer times, subscription push | ✅ |
+| 73 | Public-Domain Library | [73-gutenberg-library](73-gutenberg-library/) | Gutendex keyless book search and delivery, public domain only | Optional |
+| 74 | DAO Alerts | [74-dao-alerts](74-dao-alerts/) | Snapshot proposal polling, new/changed proposal alerts | ✅ |
+| 75 | NFT Alerts | [75-nft-alerts](75-nft-alerts/) | Contract event polling adapter, mint/sale alerts | ✅ |
+| 76 | Price Tracker | [76-price-tracker](76-price-tracker/) | Product link price watching, drop alerts + 30-day history | ✅ |
+| 77 | Dating Match | [77-dating-match](77-dating-match/) | Profile cards, mutual-like matching, 18+ gate + report/ban safety kit | ✅ |
+| 78 | VPN Panel Delivery | [78-vpn-panel](78-vpn-panel/) | Marzban/3X-UI auto-provisioning after payment, expiry disable | ✅ |
+| 79 | Habits / Pomodoro | [79-habit-pomodoro](79-habit-pomodoro/) | Habit streak check-ins + pomodoro finish reminders | ✅ |
+| 80 | Anonymous Q&A Wall | [80-anon-qa-wall](80-anon-qa-wall/) | Anonymous questions posted publicly, identity never reaches the channel | ✅ |
+| 81 | Domain / SSL Monitor | [81-domain-monitor](81-domain-monitor/) | RDAP expiry + certificate probe, 30/7/1-day tiered alerts | ✅ |
+| 82 | AI Avatar / ID Photo | [82-ai-avatar](82-ai-avatar/) | AI-styled avatars + ID photo sizing, privacy notice, nothing stored | Optional |
 
 
 Every directory has its own `README.md` (variable list + gotchas).
 
 ## 🧩 Module Library
 
-Common capabilities are broken into 45 standalone module docs (principles + copy-paste real code + integration steps + caveats): foundation, admin whitelist & tiered menus, buttons & callbacks, KV storage, channel posting, force-subscribe checks, forward routing, file storage, Cron, review flow, group management, join-request review, payment & delivery, referral attribution, RSS, check-in & lottery, config-driven menus, quiz sessions, external APIs, FSM state machine, mother-bot multi-tenancy, shop catalog & cart, franchise malls, Stars payments, werewolf hosting, stickers, image/OCR tools, native polls & reactions, forum topics, URL upload, notify adapters, paid media, AI chat, inline mode, rate limiting & retries, Mini Apps, i18n, speech-to-text, advanced translation, video downloading, advanced group guarding, personal reminders. Start here when building your own: [modules/README.md](modules/README.md).
+Common capabilities are broken into 50 standalone module docs (principles + copy-paste real code + integration steps + caveats): foundation, admin whitelist & tiered menus, buttons & callbacks, KV storage, channel posting, force-subscribe checks, forward routing, file storage, Cron, review flow, group management, join-request review, payment & delivery, referral attribution, RSS, check-in & lottery, config-driven menus, quiz sessions, external APIs, FSM state machine, mother-bot multi-tenancy, shop catalog & cart, franchise malls, Stars payments, werewolf hosting, stickers, image/OCR tools, native polls & reactions, forum topics, URL upload, notify adapters, paid media, AI chat, inline mode, rate limiting & retries, Mini Apps, i18n, speech-to-text, advanced translation, video downloading, advanced group guarding, personal reminders. Start here when building your own: [modules/README.md](modules/README.md).
 
 ## Code Conventions (building blocks)
 
