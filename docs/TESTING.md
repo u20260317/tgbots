@@ -69,6 +69,7 @@
 | 42 | Mini App 三件套 | 2026-11-20 | L4 | ✅ | GET /app 返回 200 自包含 HTML（含官方 WebApp SDK）；用 Bot Token 按官方算法（HMAC(key=WebAppData) 派生密钥）构造合法 initData：POST /api/verify → 200 回显用户，篡改 user.id 不重签 → 403 拒绝（代码口径为一律 403）；POST /api/message 验签后留言落 KV，mini:700000042 读回 [{text, at}] 正确，篡改签名同接口 → 403；Bot 侧 /app、/mymsgs 均 200，错密钥 403 |
 | 43 | 图片处理/OCR | 2026-11-20 | L4 | ✅ | 线上：/start、假 file_id 私聊发图（getFile 失败走优雅报错分支）、/resize 回复假图（处理失败分支）、/quote 未配 QUOTE_API 的明确提示分支均 200，错密钥 403。OCR 成功路径经本地 harness（同一 worker.js、打桩 getFile 与 OCR.space）验证：未配 OCR_API_KEY 时 apikey 头确为演示 key helloworld、回复含识别文本与演示额度注记、计数键 ocr:cnt:700000043:2026-11-20 读回 =1；线上真图 OCR 需真实照片 file_id，属环境边界 |
 | 44 | URL 上传转存 | 2026-11-20 | L4 | ✅ | 线上：127.0.0.1 / 192.168.x / localhost 三种内网链接与真实 favicon 链接均处理 200、无多余 f: 记录产生，错密钥 403。成功链经本地 harness（同一 worker.js、打桩 TG 与源站）验证：SSRF 链接被明确拒绝且 Worker 未对内网地址发出任何请求；小文件走 TG 直抓路（sendDocument 填 URL）成功后 f:<码> 记录读回 {kind:document, id, name:favicon.ico} 正确、取件链接已回；/start f_<码> 领取按存档 file_id 调用 sendDocument 无误。线上真转存成功需可达 chat，属环境边界 |
+| 45 | 论坛话题工单 | 2026-11-20 | L4 | ✅ | FORUM_GROUP_ID 用假群部署：用户提单时 createForumTopic 必然失败，走优雅报错分支（工单不丢）且 ticket:TK-ME6K 已落 KV 读回 {user/name/status:open} 正确、userticket: 映射在位；/myticket、管理员 /tickets 均 200；用户 /close 后工单读回 status=closed、userticket: 删除生效（读回 404，中间一次读回仍见旧值是 KV 删除传播延迟，复读确认）；错密钥 403。真实话题群的建话题/话题内路由/关话题未验证，属环境边界（需真开 Topics 的超级群 + Bot 管理话题权限） |
 
 **全量测试完成（2026-11-20）**：30 个单体 + 3 个组合全部实测完毕。共发现并修复模板 bug 1 个（17 号 name 重复拼 ID，commit 1b8bf6e）。测试中多次出现的部署后首请求 404/500 与 setWebhook 1042 均为 Cloudflare 传播期抖动，复测均通过，已在各行备注中区分记录，未计为模板问题。
 
