@@ -20,6 +20,8 @@
 <a href="#-模板目录">📚 模板目录</a> ·
 <a href="modules/README.md">🧩 模块库</a> ·
 <a href="docs/knowledge/README.md">📖 知识库</a> ·
+<a href="docs/README.md">🗺️ 文档地图</a> ·
+<a href="docs/COOKBOOK.md">🍳 实战配方</a> ·
 <a href="docs/DEPLOY.md">🚀 部署文档</a> ·
 <a href="docs/ASSEMBLY.md">🔧 拼装指南</a> ·
 <a href="docs/TESTING.md">🧪 测试记录</a>
