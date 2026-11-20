@@ -54,3 +54,4 @@ Bot 的「界面」只有两种键盘 + 命令菜单 + 深链这四样东西。�
 - 按钮/回调/翻页的完整模式：[modules/03 按钮与回调](../../modules/03-buttons-callback.md)。
 - 分级菜单（scope 实战）：[modules/02 管理员白名单与分级命令菜单](../../modules/02-admin-menu.md)。
 - 深链归因：[modules/14 邀请归因](../../modules/14-referral.md)；深链取文件：模板 06。
+- 键盘之外的富交互（游戏卡、原生投票、消息反应、Inline 结果全谱）：[14 富交互能力谱](14-games-rich-interaction.md)，成品看模板 51/46/40。
