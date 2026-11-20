@@ -381,6 +381,18 @@ async function handle(env, update) {
     // —— 浏览动作 ——
     if (act === "like" || act === "pass" || act === "report") {
       const target = arg;
+      // 喜欢/跳过必须先有自己的卡片：没建卡的账号点喜欢会污染对方的 like 列表、造出幽灵配对（举报不设此限）
+      if (act !== "report") {
+        const myProf = await kvGet(env, "date:prof:" + uid, null);
+        if (!myProf) {
+          await tg(env, "answerCallbackQuery", {
+            callback_query_id: cq.id,
+            text: "先建好你的卡片（/profile）再来哦",
+            show_alert: true,
+          });
+          return;
+        }
+      }
       await markSeen(env, uid, target);
       if (act === "report") {
         const banned = await reportUser(env, uid, target);
