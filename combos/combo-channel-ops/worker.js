@@ -90,6 +90,14 @@ button{background:#c9a227;color:#111;border:0;padding:12px 20px;border-radius:8p
 // 【核心模块】Worker 入口与路由
 // 处理健康检查、/setWebhook 一键挂载、网页面板、Webhook 密钥校验，并把更新分发给业务主流程。
 // ============================================================
+// ---------- Bot 命令菜单（部署时 /setWebhook 自动注册到输入框菜单） ----------
+const COMMANDS = [
+  { command: "start", description: "开始使用" },
+  { command: "post", description: "发帖到频道" },
+  { command: "tougao", description: "我要投稿" },
+  { command: "liuyan", description: "我要留言" },
+];
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -111,7 +119,8 @@ export default {
         secret_token: env.WEBHOOK_SECRET,
         allowed_updates: ["message", "callback_query"],
       });
-      return Response.json({ setWebhook: hook, telegram: r });
+      const cm = await tg(env, "setMyCommands", { commands: COMMANDS });
+      return Response.json({ setWebhook: hook, telegram: r, commands: cm });
     }
     if (url.pathname === "/panel" && request.method === "GET") {
       if (!env.PANEL_KEY)
