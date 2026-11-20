@@ -19,6 +19,10 @@ const admins = (env) => String(env.ADMIN_ID || "").split(",").map((s) => s.trim(
 const isAdmin = (env, id) => admins(env).includes(String(id));
 const inbox = (env) => env.SUPPORT_GROUP_ID || admins(env)[0];
 
+// ============================================================
+// 【核心模块】Telegram Bot API 通信层
+// 统一封装 tg()：所有给 Telegram 发的请求都走这里，改 API 地址/加重试只改这一处。
+// ============================================================
 async function tg(env, method, payload) {
   const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
@@ -28,6 +32,10 @@ async function tg(env, method, payload) {
 const send = (env, chat_id, text, extra = {}) => tg(env, "sendMessage", { chat_id, text, ...extra });
 
 // 从被转发消息里提取原发送者 ID（新版 Bot API 的 forward_origin）
+// ============================================================
+// 【核心模块】转发来源解析
+// 从 forward_origin / forward_from 里提取原用户 ID，是管理员回复能找对人的关键。
+// ============================================================
 function originUserId(m) {
   const o = m?.forward_origin;
   if (o?.type === "user") return o.sender_user?.id;
@@ -39,6 +47,10 @@ function describeUser(u) {
   return `${u.first_name || ""}${u.last_name ? " " + u.last_name : ""}${u.username ? " (@" + u.username + ")" : ""} · ID: ${u.id}`;
 }
 
+// ============================================================
+// 【核心模块】Worker 入口与路由
+// 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
+// ============================================================
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -59,6 +71,10 @@ export default {
   },
 };
 
+// ============================================================
+// 【核心模块】业务主流程
+// 双向转发业务主流程（用户消息转管理员、管理员回复回达用户）。这是本 Bot 真正干活的地方，其余都是它的地基。
+// ============================================================
 async function handle(env, update) {
   const msg = update.message;
   if (!msg) return;
