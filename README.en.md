@@ -1,14 +1,31 @@
+<div align="center">
+
+<img src="assets/banner.png" alt="tgbots" width="100%">
+
 # 🧩 tgbots · Single-File Telegram Bot Templates
 
 [中文](README.md) | **English** | [Русский](README.ru.md)
 
-[![Stars](https://img.shields.io/github/stars/u20260317/tgbots?style=flat-square)](https://github.com/u20260317/tgbots/stargazers)
-[![Forks](https://img.shields.io/github/forks/u20260317/tgbots?style=flat-square)](https://github.com/u20260317/tgbots/forks)
-[![Last commit](https://img.shields.io/github/last-commit/u20260317/tgbots?style=flat-square)](https://github.com/u20260317/tgbots/commits/main)
-[![License](https://img.shields.io/github/license/u20260317/tgbots?style=flat-square)](LICENSE)
-![Language](https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square)
+<p>
+<a href="https://github.com/u20260317/tgbots/stargazers"><img src="https://img.shields.io/github/stars/u20260317/tgbots?style=flat-square" alt="Stars"></a>
+<a href="https://github.com/u20260317/tgbots/forks"><img src="https://img.shields.io/github/forks/u20260317/tgbots?style=flat-square" alt="Forks"></a>
+<a href="https://github.com/u20260317/tgbots/commits/main"><img src="https://img.shields.io/github/last-commit/u20260317/tgbots?style=flat-square" alt="Last commit"></a>
+<a href="LICENSE"><img src="https://img.shields.io/github/license/u20260317/tgbots?style=flat-square" alt="License"></a>
+<img src="https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square" alt="Language">
+</p>
 
 **30 everyday Telegram bots, each a single standalone `worker.js` file**: copy-paste into a Cloudflare Worker and deploy — zero dependencies, zero servers, runs on the Workers free tier. Plus **34 module docs** that break common capabilities into building blocks you can assemble into your own bot.
+
+<p>
+<a href="#-templates">📚 Templates</a> ·
+<a href="modules/README.md">🧩 Modules</a> ·
+<a href="docs/knowledge/README.md">📖 Knowledge Base</a> ·
+<a href="docs/DEPLOY.md">🚀 Deploy</a> ·
+<a href="docs/ASSEMBLY.md">🔧 Assembly</a> ·
+<a href="docs/TESTING.md">🧪 Tests</a>
+</p>
+
+</div>
 
 ## ✨ Highlights
 
