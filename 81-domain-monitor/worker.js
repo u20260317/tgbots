@@ -62,7 +62,12 @@ async function rdapExpiry(domain) {
   const r = await fetch(
     `https://rdap.org/domain/${encodeURIComponent(domain)}`,
     {
-      headers: { accept: "application/rdap+json, application/json" },
+      // 必须带 UA：rdap.org 对无 User-Agent 的请求直接 403（实测 Workers/undici 默认请求都会被拦）
+      headers: {
+        accept: "application/rdap+json, application/json",
+        "user-agent":
+          "domain-monitor-bot/1.0 (Telegram bot; RDAP expiry check)",
+      },
       redirect: "follow",
       signal: AbortSignal.timeout(10000),
     },
