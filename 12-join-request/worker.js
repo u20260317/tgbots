@@ -99,6 +99,9 @@ async function decline(env, chatId, userId) {
 // 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
 // 注意：allowed_updates 必须包含 chat_join_request，否则 Telegram 根本不会推申请事件。
 // ============================================================
+// ---------- Bot 命令菜单（部署时 /setWebhook 自动注册到输入框菜单） ----------
+const COMMANDS = [{ command: "start", description: "使用说明" }];
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -120,7 +123,8 @@ export default {
         secret_token: env.WEBHOOK_SECRET,
         allowed_updates: ["message", "callback_query", "chat_join_request"],
       });
-      return Response.json({ setWebhook: hook, telegram: r });
+      const cm = await tg(env, "setMyCommands", { commands: COMMANDS });
+      return Response.json({ setWebhook: hook, telegram: r, commands: cm });
     }
     if (url.pathname !== "/webhook" || request.method !== "POST")
       return new Response("not found", { status: 404 });
