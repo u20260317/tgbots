@@ -30,6 +30,18 @@
 - 每个 `worker.js` 的核心模块都用 `【核心模块】` 横幅注释标注（通信层、入口路由、业务主流程，以及各自的关键子模块如订阅校验、目录索引等），照着横幅就能整段拆出来复用。
 - 想把几个 Bot 拼成一个：看 [docs/ASSEMBLY.md](docs/ASSEMBLY.md)（组装五步 + 已知冲突清单 + 现成组合推荐）。
 
+## 拼装组合（combos/）
+
+单体拼成的成品组合，各占一个子目录、依然单文件部署：
+
+| 组合 | 子目录 | 拼装 |
+|------|--------|------|
+| 频道运营全家桶 | [combos/combo-channel-ops](combos/combo-channel-ops/) | 01 发帖 + 05 投稿 + 02 双向 |
+| 社群守卫 | [combos/combo-group-guard](combos/combo-group-guard/) | 03 强订 + 04 群管理 |
+| 强订网盘 | [combos/combo-drive-gate](combos/combo-drive-gate/) | 03 强订 + 10 网盘 |
+
+索引见 [combos/README.md](combos/README.md)。
+
 ## 安全须知
 
 - **Bot Token 只填进 Cloudflare 的 Secret 变量里，不要写进代码、不要发到聊天/群里。** 泄露后去 @BotFather 用 /revoke 重置。
