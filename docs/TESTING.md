@@ -61,3 +61,6 @@
 ## 已知测试限制
 - scheduled()（Cron 触发）无法通过 HTTP 直接调用，11/14/21/23 的定时路径用其手动触发口（如 /push、/sweep、/pushnow）或命令路径替代验证，并在备注里注明。
 - 涉及「给频道/群发消息」的流程，模拟环境里目标 chat 为模拟 ID，Telegram 侧必然报错；判定看 Worker 侧处理与状态落盘。
+
+## 补丁记录
+- 2026-11-20 命令菜单补丁：用户指出全部模板未注册 Telegram 官方命令菜单（setMyCommands）。已给 33 个 worker.js（30 单体 + 3 组合）统一加上 COMMANDS 常量与 /setWebhook 时自动注册，命令表逐个按代码里真实存在的命令核对；全部重新过 node --check。当前常驻的 13 已重新部署，其 /setWebhook 返回包含 commands 注册结果，getMyCommands 读回 6 条命令无误。此后新部署的任何模板，挂 webhook 即带菜单。
