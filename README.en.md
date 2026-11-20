@@ -20,6 +20,8 @@
 <a href="#-templates">📚 Templates</a> ·
 <a href="modules/README.md">🧩 Modules</a> ·
 <a href="docs/knowledge/README.md">📖 Knowledge Base</a> ·
+<a href="docs/README.md">🗺️ Docs Map</a> ·
+<a href="docs/COOKBOOK.md">🍳 Cookbook</a> ·
 <a href="docs/DEPLOY.md">🚀 Deploy</a> ·
 <a href="docs/ASSEMBLY.md">🔧 Assembly</a> ·
 <a href="docs/TESTING.md">🧪 Tests</a>
