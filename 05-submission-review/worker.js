@@ -12,6 +12,10 @@
 // 部署后访问 https://你的Worker地址/setWebhook?key=你的WEBHOOK_SECRET
 // ============================================================
 
+// ============================================================
+// 【核心模块】Telegram Bot API 通信层
+// 统一封装 tg()：所有给 Telegram 发的请求都走这里，改 API 地址/加重试只改这一处。
+// ============================================================
 async function tg(env, method, payload) {
   const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
@@ -21,6 +25,10 @@ async function tg(env, method, payload) {
 const send = (env, chat_id, text, extra = {}) => tg(env, "sendMessage", { chat_id, text, ...extra });
 const who = (u) => `${u.first_name || ""}${u.username ? " (@" + u.username + ")" : ""} · ID ${u.id}`;
 
+// ============================================================
+// 【核心模块】Worker 入口与路由
+// 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
+// ============================================================
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -41,6 +49,10 @@ export default {
   },
 };
 
+// ============================================================
+// 【核心模块】业务主流程
+// 投稿审核业务主流程（投稿转发、审核按钮、发布/拒绝通知）。这是本 Bot 真正干活的地方，其余都是它的地基。
+// ============================================================
 async function handle(env, update) {
   const cq = update.callback_query;
   if (cq) {
