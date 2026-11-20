@@ -89,5 +89,6 @@ function topView(rows, page) {
 | `mall:` | 商城开店向导/店铺管理 | 模板 33 |
 | `dl:` | 下载画质选择 | 模板 34 |
 | `stk:` | 贴纸 emoji 选择 | 模板 37 |
+| `pdf:` | PDF 拼装/清空（make/clear） | 模板 49 |
 
 新拼模块时先查这张表，前缀不撞就能共存；完整拼装规则见 [docs/ASSEMBLY.md](../docs/ASSEMBLY.md)。
