@@ -64,3 +64,4 @@ Telegram 服务器 ──④──► 用户收到回复
 - 第一个 Bot 的完整骨架：[modules/01 基础骨架](../../modules/01-foundation.md)（tg 封装、入口、验签都在里面）。
 - 查 ID 的工具：模板 `08-id-tools`。
 - 全库的安全默认（token 只进 Secret 等）：[docs/DESIGN.md](../DESIGN.md) 的安全模型一节。
+- 想照着一篇走完一个完整产品（从拼装到上线）：[19 长文教程：付费课程 Bot](19-end-to-end-paid-bot.md)。
