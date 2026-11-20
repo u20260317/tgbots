@@ -236,9 +236,53 @@ async function handle(env, update) {
     return;
   }
 
+  // ---------- 赛季榜分页（/quiztop 与翻页按钮共用） ----------
+  // 每页 10 条；翻页按钮回调 qtop:<页码>，页码指示按钮是 qtop:noop（点了无动作）。
+  const TOP_PAGE = 10;
+  async function quizTopRows() {
+    const list = await env.BOT_KV.list({ prefix: "quizpts:", limit: 1000 });
+    const rows = [];
+    for (const k of list.keys) {
+      const raw = await env.BOT_KV.get(k.name);
+      if (raw) rows.push(JSON.parse(raw));
+    }
+    rows.sort((a, b) => b.pts - a.pts);
+    return rows;
+  }
+  function quizTopView(rows, page) {
+    const pages = Math.max(1, Math.ceil(rows.length / TOP_PAGE));
+    const p = Math.min(Math.max(0, page), pages - 1);
+    const text =
+      "🏆 竞答赛季总榜\n\n" +
+      rows
+        .slice(p * TOP_PAGE, p * TOP_PAGE + TOP_PAGE)
+        .map((r, i) => `${p * TOP_PAGE + i + 1}. ${r.name} — ${r.pts} 分`)
+        .join("\n");
+    if (pages <= 1) return { text };
+    const nav = [];
+    if (p > 0) nav.push({ text: "⬅️ 上一页", callback_data: `qtop:${p - 1}` });
+    nav.push({ text: `${p + 1}/${pages}`, callback_data: "qtop:noop" });
+    if (p < pages - 1)
+      nav.push({ text: "下一页 ➡️", callback_data: `qtop:${p + 1}` });
+    return { text, reply_markup: { inline_keyboard: [nav] } };
+  }
+
   // ---------- 答题按钮 ----------
   const cq = update.callback_query;
   if (cq) {
+    if (String(cq.data || "").startsWith("qtop:")) {
+      if (cq.data === "qtop:noop")
+        return tg(env, "answerCallbackQuery", { callback_query_id: cq.id });
+      const rows = await quizTopRows();
+      const v = quizTopView(rows, parseInt(cq.data.slice(5), 10) || 0);
+      await tg(env, "answerCallbackQuery", { callback_query_id: cq.id });
+      return tg(env, "editMessageText", {
+        chat_id: cq.message.chat.id,
+        message_id: cq.message.message_id,
+        text: v.text,
+        ...(v.reply_markup ? { reply_markup: v.reply_markup } : {}),
+      });
+    }
     if (!String(cq.data || "").startsWith("quiz:")) return;
     const chatId = cq.message.chat.id;
     const s = await getSession(env, chatId);
@@ -325,23 +369,15 @@ async function handle(env, update) {
     return finishSession(env, chatId, s, "提前结束");
   }
   if (cmd === "/quiztop") {
-    const list = await env.BOT_KV.list({ prefix: "quizpts:", limit: 200 });
-    const rows = [];
-    for (const k of list.keys) {
-      const raw = await env.BOT_KV.get(k.name);
-      if (raw) rows.push(JSON.parse(raw));
-    }
-    rows.sort((a, b) => b.pts - a.pts);
+    const rows = await quizTopRows();
     if (!rows.length)
       return send(env, chatId, "赛季榜还是空的，来 /quiz 开一局。");
+    const v = quizTopView(rows, 0);
     return send(
       env,
       chatId,
-      "🏆 竞答赛季总榜 Top 10\n\n" +
-        rows
-          .slice(0, 10)
-          .map((r, i) => `${i + 1}. ${r.name} — ${r.pts} 分`)
-          .join("\n"),
+      v.text,
+      v.reply_markup ? { reply_markup: v.reply_markup } : {},
     );
   }
   if (cmd === "/start" || cmd === "/help")
