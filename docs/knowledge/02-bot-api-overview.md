@@ -45,4 +45,5 @@ Bot API 用「大版本.小版本」编号（如 9.x），更新日志在官方�
 
 - 裸 API 封装的取舍：[modules/01 基础骨架](../../modules/01-foundation.md)。
 - 全库如何按更新类型分发：每个模板的 `handle()` 就是活教材，从 02-two-way-support 开始看最简单。
-- 官方新能力的落地评估实例：模块 21 文末的 Managed Bots 二期路线、模块 25 的流式草稿说明。
+- 官方新能力的落地评估实例：Managed Bots 已从「二期路线」落地为模板 54，专文见 [12 Managed Bots 全解](12-managed-bots.md)；Business 代答见 [13](13-business-api.md) 与模板 53；流式草稿看模块 25 的说明。
+- 跟踪演进的方法论：[20 跟踪 Bot API 演进](20-api-evolution.md)（评估五问与升级流程）。
