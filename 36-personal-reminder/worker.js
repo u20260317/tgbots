@@ -62,13 +62,13 @@ function parseWhen(env, s) {
     return {
       at: now + Number(m[1]) * 60 * 1000,
       repeat: "",
-      rest: s.slice(m[0].length),
+      rest: s.slice(m[0].length).trim(),
     };
   if ((m = s.match(/^(\d+)\s*小时后/)))
     return {
       at: now + Number(m[1]) * 3600 * 1000,
       repeat: "",
-      rest: s.slice(m[0].length),
+      rest: s.slice(m[0].length).trim(),
     };
   if ((m = s.match(/^(\d+)\s*天后/))) {
     const d = localDate(env, now + Number(m[1]) * 86400 * 1000);
@@ -76,7 +76,7 @@ function parseWhen(env, s) {
     return {
       at: d.getTime() - tzOffset(env),
       repeat: "",
-      rest: s.slice(m[0].length),
+      rest: s.slice(m[0].length).trim(),
     };
   }
   const timeM = s.match(/(\d{1,2})[:：](\d{2})/);
