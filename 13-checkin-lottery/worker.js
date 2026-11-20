@@ -93,15 +93,52 @@ async function saveLottery(env, id, lot) {
 // 【核心模块】Worker 入口与路由
 // 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
 // ============================================================
-// ---------- Bot 命令菜单（部署时 /setWebhook 自动注册到输入框菜单） ----------
-const COMMANDS = [
+// ============================================================
+// 【核心模块】管理员白名单与分级命令菜单
+// 白名单怎么绑：环境变量 ADMIN_ID 填管理员数字 ID（多个英文逗号
+// 隔开），菜单分级和业务里的 isAdmin() 校验都认这份名单——不靠
+// 用户名，用户名能改、能冒充，数字 ID 不会。
+// 菜单为什么分两级：setMyCommands 支持 scope（作用域）——
+//   · 默认 scope 注册 COMMANDS_USER，所有人都能看到；
+//   · 再给每个管理员 ID 用 scope=chat 注册「用户+管理员」全集，
+//     于是管理员命令只出现在管理员本人私聊的菜单里，普通用户
+//     的菜单里根本看不到这些命令。
+// 重要：菜单隐藏只是体验层，不是安全边界——普通用户手打命令
+// 照样能发过来，真正的拦截靠业务主流程里每个管理员命令的
+// isAdmin 校验（一直都有）。两层配合：看不见 + 用不了。
+// 新增管理员命令：写进 COMMANDS_ADMIN，并在业务主流程里给它
+// 加 isAdmin 判断，两处缺一不可。没有管理员命令的 Bot，
+// COMMANDS_ADMIN 留空数组即可，本模块会自动只注册用户菜单。
+// ============================================================
+const COMMANDS_USER = [
   { command: "qd", description: "每日签到领积分" },
   { command: "me", description: "我的积分与连签" },
   { command: "top", description: "积分排行榜" },
-  { command: "lottery", description: "发起抽奖（管理员）" },
-  { command: "draw", description: "开奖（管理员）" },
   { command: "start", description: "使用说明" },
 ];
+const COMMANDS_ADMIN = [
+  { command: "lottery", description: "发起抽奖（管理员）" },
+  { command: "draw", description: "开奖（管理员）" },
+];
+async function registerCommands(env) {
+  // 先注册默认菜单（所有人可见的用户命令）
+  const r = await tg(env, "setMyCommands", { commands: COMMANDS_USER });
+  // 再给白名单里每个管理员单独注册全集菜单（只在他私聊里生效）
+  if (COMMANDS_ADMIN.length) {
+    const all = [...COMMANDS_USER, ...COMMANDS_ADMIN];
+    const ids = String(env.ADMIN_ID || "")
+      .split(",")
+      .map((x) => x.trim())
+      .filter(Boolean);
+    for (const id of ids) {
+      await tg(env, "setMyCommands", {
+        commands: all,
+        scope: { type: "chat", chat_id: Number(id) },
+      });
+    }
+  }
+  return r;
+}
 
 export default {
   async fetch(request, env, ctx) {
@@ -124,7 +161,7 @@ export default {
         secret_token: env.WEBHOOK_SECRET,
         allowed_updates: ["message", "callback_query"],
       });
-      const cm = await tg(env, "setMyCommands", { commands: COMMANDS });
+      const cm = await registerCommands(env);
       return Response.json({ setWebhook: hook, telegram: r, commands: cm });
     }
     if (url.pathname !== "/webhook" || request.method !== "POST")
@@ -218,11 +255,15 @@ async function handle(env, update) {
   if (cmd === "/qd" || cmd === "/checkin" || text === "签到") {
     const prof = await getProfile(env, msg.from.id);
     const today = dayKey(env);
+    const todayLabel = (() => {
+      const [y, m, d] = today.split("-").map(Number);
+      return `${y}年${m}月${d}日`;
+    })();
     if (prof.last === today)
       return send(
         env,
         chatId,
-        `📅 今天已经签过啦。当前积分 ${prof.p}，连签 ${prof.streak} 天，明天再来。`,
+        `📅 ${todayLabel} 今天已经签过啦。当前积分 ${prof.p}，连签 ${prof.streak} 天，明天再来。`,
       );
     prof.streak = prof.last === yesterdayKey(env) ? prof.streak + 1 : 1;
     const gain = 10 + Math.min(prof.streak - 1, 10);
@@ -233,7 +274,7 @@ async function handle(env, update) {
     return send(
       env,
       chatId,
-      `✅ 签到成功 +${gain} 分（连签 ${prof.streak} 天）\n当前积分：${prof.p}`,
+      `✅ ${todayLabel} 签到成功 +${gain} 分（连签 ${prof.streak} 天）\n当前积分：${prof.p}`,
     );
   }
 
