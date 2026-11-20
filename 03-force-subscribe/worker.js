@@ -20,6 +20,10 @@
 // 部署后访问 https://你的Worker地址/setWebhook?key=你的WEBHOOK_SECRET
 // ============================================================
 
+// ============================================================
+// 【核心模块】Telegram Bot API 通信层
+// 统一封装 tg()：所有给 Telegram 发的请求都走这里，改 API 地址/加重试只改这一处。
+// ============================================================
 async function tg(env, method, payload) {
   const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
@@ -39,6 +43,10 @@ function linkFor(env, chat, idx) {
 }
 
 // 返回未加入的频道列表
+// ============================================================
+// 【核心模块】订阅状态校验（核心判定）
+// 逐个查 getChatMember，返回用户还没加入的频道/群清单；门禁和守卫都靠它判定。
+// ============================================================
 async function missingSubs(env, userId) {
   const missing = [];
   for (const [i, chat] of requiredChats(env).entries()) {
@@ -49,6 +57,10 @@ async function missingSubs(env, userId) {
   return missing;
 }
 
+// ============================================================
+// 【核心模块】加入引导键盘
+// 按未加入清单生成「加入按钮 + 我已加入验证按钮」。
+// ============================================================
 function joinKeyboard(env, missing) {
   const rows = missing.map((m) => {
     const link = linkFor(env, m.chat, m.idx);
@@ -58,6 +70,10 @@ function joinKeyboard(env, missing) {
   return { inline_keyboard: rows };
 }
 
+// ============================================================
+// 【核心模块】Worker 入口与路由
+// 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
+// ============================================================
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -78,6 +94,10 @@ export default {
   },
 };
 
+// ============================================================
+// 【核心模块】业务主流程
+// 订阅校验业务主流程（私聊门禁 + 群内守卫）。这是本 Bot 真正干活的地方，其余都是它的地基。
+// ============================================================
 async function handle(env, update) {
   const cq = update.callback_query;
   if (cq) {
