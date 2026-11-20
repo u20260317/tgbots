@@ -23,6 +23,16 @@
 | 17 | [配置驱动菜单与关键词回复](17-config-menu.md) | CONFIG 菜单树、关键词匹配 | 07 |
 | 18 | [竞答游戏会话](18-quiz-session.md) | KV 会话状态机、按钮抢答与锁定 | 26 |
 | 19 | [外部 API 调用与提醒](19-external-api.md) | 公开接口拉数、条件命中推送 | 23 / 27 / 28 |
+| 25 | [AI 对话](25-ai-chat.md) | OpenAI 兼容接口、per-user 上下文存 KV、人设与用量控制 | 新增扩展 |
+| 26 | [Inline 模式](26-inline-mode.md) | inline_query 结果卡片、chosen_inline_result 点击反馈 | 新增扩展 |
+| 27 | [限流与 429 重试](27-rate-limit-retry.md) | tg() 增强版：出站节流桶、retry_after 退避、广播分片队列 | 01 改造 |
+| 28 | [Mini App 接入](28-mini-app.md) | web_app 按钮、initData 的 HMAC-SHA-256 验签、web_app_data 回传 | 新增扩展 |
+| 29 | [多语言 i18n](29-i18n.md) | 按 language_code 选包、文案外置、多语言命令菜单 | 新增扩展 |
+| 30 | [语音转文字](30-speech-to-text.md) | getFile 下载语音 + Whisper 类接口、群自动转写开关 | 19 外部 API |
+| 31 | [翻译进阶](31-translate-plus.md) | 文档/语音/图片 OCR 翻译管线、群自动翻译模式 | 27 升级 |
+| 32 | [视频下载](32-video-download.md) | 链接识别、可替换解析层、50MB 发货上限与中转 | 新增扩展 |
+| 33 | [群管进阶](33-group-guard-plus.md) | 联邦封禁名单、CAS 垃圾库查询、群笔记 #tag、过滤器回复 | 04 / 11 进阶 |
+| 34 | [个人提醒/待办](34-personal-reminder.md) | 自然语言时间解析、周期提醒扫描、待办按钮清单 | 09 / 21 姊妹篇 |
 | 20 | [通用状态机 FSM](20-fsm.md) | 分步向导的通用骨架（状态+数据存 KV） | 新模式（框架标配） |
 | 21 | [母体 Bot 多租户托管](21-mother-bot.md) | 交 token 克隆子 Bot：加密存储、slug 路由、租户隔离 | 新模式（专项 A） |
 | 22 | [商店目录与购物车](22-shop.md) | 分类目录、商品卡、购物车、结账衔接 | 新模式（专项 B） |
