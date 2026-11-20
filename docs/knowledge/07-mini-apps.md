@@ -55,5 +55,6 @@ Mini App 就是一个 HTTPS 网页，被 Telegram 客户端用内嵌 WebView 打
 ## 在本库里看哪里落地
 
 - 验签与回传的完整实现：[modules/28 Mini App 接入](../../modules/28-mini-app.md)（含实测记录）。
+- 单文件三件套成品（Worker 同时托管页面与验签 API）：模板 42。注意游戏页不是 Mini App、没有 initData，身份注入方式见 [14 富交互能力谱](14-games-rich-interaction.md)。
 - 典型搭档：模块 22（商店）的复杂目录用 Mini App 做门面、Bot 做订单与通知。
 - 身份与接口安全：[09 安全](09-security.md)。
