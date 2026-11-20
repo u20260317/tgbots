@@ -279,7 +279,7 @@ async function handle(env, update) {
       `✅ 已订阅：${city} ${rooms} ≤ ${max}。` +
         (env.ESTATE_API_URL
           ? "正在帮你拉第一批…"
-          : "\n⚠️ 管理员还没接入房源 API（ESTATE_API_URL），接下来推给你的将是，只用于演示流程，不是真实房源。"),
+          : "\n⚠️ 管理员还没接入房源 API（ESTATE_API_URL），接下来推给你的将是演示数据，只用于演示流程，不是真实房源。"),
     );
     try {
       const n = await checkSub(env, uid, sub);
