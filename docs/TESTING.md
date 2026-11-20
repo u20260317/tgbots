@@ -34,7 +34,12 @@
 | 09 | 订阅群发 | 2026-11-20 | L4 | ✅ | 两用户 /start 后补测读回 subs=[800000209] 证明订阅落盘；主测中广播后 subs 被清为空是「失效订阅自动清理」按设计触发（模拟用户 chat not found 被判失效），非 bug |
 | 10 | 网盘（私有频道） | 2026-11-20 | L3 | ✅ | /start、发文件、/list、/stats 均 200，错密钥 403；边界：转存需 copyMessage 到真实存储频道成功才写索引，模拟频道下 index 未落盘（读回 404），属环境限制 |
 | 11 | RSS/定时推送 | 2026-11-20 | L4 | ✅ | GET /push 返回 {pushed:0, seeded:1, errors:0}，KV rss_state 读回真实 HN 条目完成播种；/status 200，错密钥 403；Cron 路径以 /push 手动口替代（见限制说明） |
-| 其余 18 个单体 + 3 个组合 | | | | ⏳ | 全量测试进行中，逐个回填本表 |
+| 12 | 入群申请审核 | 2026-11-20 | L4 | ✅ | question 模式：chat_join_request 后 KV 读回 pending:800000112 内容正确，答题转发与 jr:ok 回调均 200，错密钥 403；边界：approveChatJoinRequest 对模拟群无法真正生效 |
+| 14 | 付费会员 | 2026-11-20 | L4 | ✅ | 选 plan:m1 后 KV 出现 order:vpyrs，paid: 后状态变 waitconfirm（读回验证）；边界：payok 后开发邀请链接需真实目标群，模拟群下开通失败、订单停在 waitconfirm（按设计），该步待真实群验 |
+| 15 | 数字商品售货 | 2026-11-20 | L4 | ✅ | 全链读回验证：/addproduct 建 prod:r9a8b → /addstock 库存 1 → buy: 建单 → paid: 待确认 → payok: 后库存变 [] 且订单 status=done、delivered=CARD-001-TEST；注：首次 payok 与 paid 的 KV 写入撞车被状态校验拦下，补发后成功，属测试时序问题 |
+| 16 | 邀请引流统计 | 2026-11-20 | L4 | ✅ | 深链 /start ref_ 后读回 refdone:800000116=800000016、ref:800000016={count:1}；/invite、/topinv 均 200；注：首个更新曾遇传播期 404，复测通过 |
+| 17 | 任务赚钱 | 2026-11-20 | L4 | ✅ | /addtask 建 task 两条；verify: 对不存在频道正确不发分；submit: 生成 claim:，claimok: 后 pts 读回 +50；🐛 发现并修复 bug：claimok 发分时积分档案 name 被重复拼「· ID」（claim 存的已是格式化名又过一次 who()），已存原始 fname/uname 修复，推送 commit 1b8bf6e，复测 name 只出现一次 ID、+30 正确 |
+| 其余 13 个单体 + 3 个组合 | | | | ⏳ | 全量测试进行中，逐个回填本表 |
 
 ## 已知测试限制
 - scheduled()（Cron 触发）无法通过 HTTP 直接调用，11/14/21/23 的定时路径用其手动触发口（如 /push、/sweep、/pushnow）或命令路径替代验证，并在备注里注明。
