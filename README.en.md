@@ -14,7 +14,7 @@
 <img src="https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square" alt="Language">
 </p>
 
-**40 everyday Telegram bots, each a single standalone `worker.js` file**: copy-paste into a Cloudflare Worker and deploy — zero dependencies, zero servers, runs on the Workers free tier. Plus **42 module docs** that break common capabilities into building blocks you can assemble into your own bot.
+**51 everyday Telegram bots, each a single standalone `worker.js` file**: copy-paste into a Cloudflare Worker and deploy — zero dependencies, zero servers, runs on the Workers free tier. Plus **45 module docs** that break common capabilities into building blocks you can assemble into your own bot.
 
 <p>
 <a href="#-templates">📚 Templates</a> ·
@@ -94,13 +94,24 @@ Step-by-step with screenshots, how to find every ID, how to bind KV, common erro
 | 38 | Weather | [38-weather](38-weather/) | Open-Meteo forecasts + daily forecast subscription | ✅ |
 | 39 | GitHub Notify | [39-github-notify](39-github-notify/) | GitHub webhooks verified by HMAC and pushed as formatted messages | ✅ |
 | 40 | Inline Tools | [40-inline-tools](40-inline-tools/) | Inline mode: search, unit conversion, calculator, timestamps in any chat | No |
+| 41 | Werewolf Host | [41-werewolf](41-werewolf/) | Group game state machine: role DMs, night actions, day votes | ✅ |
+| 42 | Mini App Kit | [42-mini-app](42-mini-app/) | One Worker = bot + web page + API, initData verification, guestbook | Recommended |
+| 43 | Image / OCR | [43-image-ocr](43-image-ocr/) | Photo OCR, resize/format, quote images — external services orchestrated | Optional |
+| 44 | URL Upload | [44-url-upload](44-url-upload/) | Fetch web files into Telegram via three routes, SSRF guard, pickup codes | Optional |
+| 45 | Forum Tickets | [45-forum-ticket](45-forum-ticket/) | One ticket = one forum topic; staff replies in-topic reach the user | ✅ |
+| 46 | Native Poll / Quiz | [46-native-poll](46-native-poll/) | sendPoll voting and quiz scoring/ranking, reaction counting | ✅ |
+| 47 | Translate Plus | [47-translate-plus](47-translate-plus/) | Document/voice/image translation pipelines + group auto-translate | For group toggle |
+| 48 | Federation Guard | [48-fed-guard](48-fed-guard/) | Cross-group shared bans + CAS blocklist + group notes + filters | ✅ |
+| 49 | PDF Tools | [49-pdf-tools](49-pdf-tools/) | Images to PDF locally in pure JS; extract/convert via external services | ✅ |
+| 50 | Music | [50-music](50-music/) | Audio downloads via resolver, AudD song recognition, daily quota | ✅ |
+| 51 | Game Platform | [51-game-platform](51-game-platform/) | Worker-hosted Snake/2048, sendGame cards, signed-token scoring | Recommended |
 
 
 Every directory has its own `README.md` (variable list + gotchas).
 
 ## 🧩 Module Library
 
-Common capabilities are broken into 42 standalone module docs (principles + copy-paste real code + integration steps + caveats): foundation, admin whitelist & tiered menus, buttons & callbacks, KV storage, channel posting, force-subscribe checks, forward routing, file storage, Cron, review flow, group management, join-request review, payment & delivery, referral attribution, RSS, check-in & lottery, config-driven menus, quiz sessions, external APIs, FSM state machine, mother-bot multi-tenancy, shop catalog & cart, franchise malls, Stars payments, werewolf hosting, stickers, image/OCR tools, native polls & reactions, forum topics, URL upload, notify adapters, paid media, AI chat, inline mode, rate limiting & retries, Mini Apps, i18n, speech-to-text, advanced translation, video downloading, advanced group guarding, personal reminders. Start here when building your own: [modules/README.md](modules/README.md).
+Common capabilities are broken into 45 standalone module docs (principles + copy-paste real code + integration steps + caveats): foundation, admin whitelist & tiered menus, buttons & callbacks, KV storage, channel posting, force-subscribe checks, forward routing, file storage, Cron, review flow, group management, join-request review, payment & delivery, referral attribution, RSS, check-in & lottery, config-driven menus, quiz sessions, external APIs, FSM state machine, mother-bot multi-tenancy, shop catalog & cart, franchise malls, Stars payments, werewolf hosting, stickers, image/OCR tools, native polls & reactions, forum topics, URL upload, notify adapters, paid media, AI chat, inline mode, rate limiting & retries, Mini Apps, i18n, speech-to-text, advanced translation, video downloading, advanced group guarding, personal reminders. Start here when building your own: [modules/README.md](modules/README.md).
 
 ## Code Conventions (building blocks)
 
