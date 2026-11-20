@@ -46,6 +46,9 @@
 | 40 | [URL 上传转存](40-url-upload.md) | 外网链接拉取转存 TG：双路线分流、SSRF 与大小护栏 | 08 外部版 |
 | 41 | [通知适配器](41-notify-adapters.md) | GitHub webhook 验签格式化、存活监控 dead man's switch | 20 专用适配 |
 | 42 | [付费媒体](42-paid-media.md) | sendPaidMedia 卖图/视频、与 Stars 到账联动、已购复看 | 24 媒体形态 |
+| 43 | [PDF 工具](43-pdf-tools.md) | 纯 JS JPEG 拼 PDF、PDF 提文字走 OCR、转图/合并/拆分走外部 API | 新增扩展（模板 49） |
+| 44 | [音乐下载与识曲](44-music.md) | 可替换解析层下音频、AudD 指纹识曲、版权边界 | 32 姊妹篇（模板 50） |
+| 45 | [HTML5 游戏平台](45-games.md) | sendGame 发卡、签名令牌身份注入、setGameScore 记分与总榜 | 新增扩展（模板 51） |
 
 ## 怎么用
 
