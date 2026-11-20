@@ -28,7 +28,7 @@
    - `WEBHOOK_SECRET`：类型 Secret，自己编一串长随机字符（如 24 位字母数字），记住它，第 4 步要用。
    - 其它（ADMIN_ID、CHANNEL_ID 等）：类型选 Text/Variable 明文即可。
    - 添加完变量后需要再 **Deploy** 一次才生效（控制台会提示）。
-5. 需要 KV 的 Bot（06、09、10）：先到 **Workers & Pages → KV** 建一个命名空间（如 `bot-kv`），再到该 Worker 的 **Settings → Bindings → Add → KV Namespace**，变量名必须填 `BOT_KV`，选刚建的命名空间，保存并重新 Deploy。
+5. 需要 KV 的 Bot（06、09、10、11、13、14、15、16、17、18，另 12 仅答题模式、组合 combo-drive-gate 需要）：先到 **Workers & Pages → KV** 建一个命名空间（如 `bot-kv`），再到该 Worker 的 **Settings → Bindings → Add → KV Namespace**，变量名必须填 `BOT_KV`，选刚建的命名空间，保存并重新 Deploy。
 
 ## 第 4 步：挂 Webhook（让 Telegram 把消息推给 Worker）
 
