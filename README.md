@@ -1,14 +1,31 @@
+<div align="center">
+
+<img src="assets/banner.png" alt="tgbots" width="100%">
+
 # 🧩 tgbots · Telegram Bot 单文件模板库
 
 **中文** | [English](README.en.md) | [Русский](README.ru.md)
 
-[![Stars](https://img.shields.io/github/stars/u20260317/tgbots?style=flat-square)](https://github.com/u20260317/tgbots/stargazers)
-[![Forks](https://img.shields.io/github/forks/u20260317/tgbots?style=flat-square)](https://github.com/u20260317/tgbots/forks)
-[![Last commit](https://img.shields.io/github/last-commit/u20260317/tgbots?style=flat-square)](https://github.com/u20260317/tgbots/commits/main)
-[![License](https://img.shields.io/github/license/u20260317/tgbots?style=flat-square)](LICENSE)
-![Language](https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square)
+<p>
+<a href="https://github.com/u20260317/tgbots/stargazers"><img src="https://img.shields.io/github/stars/u20260317/tgbots?style=flat-square" alt="Stars"></a>
+<a href="https://github.com/u20260317/tgbots/forks"><img src="https://img.shields.io/github/forks/u20260317/tgbots?style=flat-square" alt="Forks"></a>
+<a href="https://github.com/u20260317/tgbots/commits/main"><img src="https://img.shields.io/github/last-commit/u20260317/tgbots?style=flat-square" alt="Last commit"></a>
+<a href="LICENSE"><img src="https://img.shields.io/github/license/u20260317/tgbots?style=flat-square" alt="License"></a>
+<img src="https://img.shields.io/github/languages/top/u20260317/tgbots?style=flat-square" alt="Language">
+</p>
 
-**30 个常用 Telegram Bot，每个都是一个独立的 `worker.js` 单文件**：复制粘贴到 Cloudflare Worker 即可部署——零依赖、零服务器、跑在 Workers 免费额度里。另有 **34 篇模块文档**把常用能力拆成积木，照着拼就能组出自己的 Bot。
+**40 个常用 Telegram Bot，每个都是一个独立的 `worker.js` 单文件**：复制粘贴到 Cloudflare Worker 即可部署——零依赖、零服务器、跑在 Workers 免费额度里。另有 **34 篇模块文档**把常用能力拆成积木，照着拼就能组出自己的 Bot。
+
+<p>
+<a href="#-模板目录">📚 模板目录</a> ·
+<a href="modules/README.md">🧩 模块库</a> ·
+<a href="docs/knowledge/README.md">📖 知识库</a> ·
+<a href="docs/DEPLOY.md">🚀 部署文档</a> ·
+<a href="docs/ASSEMBLY.md">🔧 拼装指南</a> ·
+<a href="docs/TESTING.md">🧪 测试记录</a>
+</p>
+
+</div>
 
 ## ✨ 特色
 
@@ -67,6 +84,16 @@
 | 28 | 工具箱 | [28-toolbox](28-toolbox/) | 二维码/短链/哈希/Base64/UUID/随机选/时间戳 | 否 |
 | 29 | 匿名信箱 | [29-anonymous-box](29-anonymous-box/) | 专属链接收匿名留言，回复即匿名回信 | ✅ |
 | 30 | 客服工单 | [30-support-ticket](30-support-ticket/) | 带编号工单+客服群协作回复，按钮关单 | ✅ |
+| 31 | AI 聊天 | [31-ai-chat](31-ai-chat/) | OpenAI 兼容接口聊天：上下文记忆、人设切换、用量上限 | ✅ |
+| 32 | 母体 Bot | [32-mother-bot](32-mother-bot/) | 交 Token 克隆子 Bot：加密托管、内置客服/签到双内核 | ✅ |
+| 33 | 商城 Bot | [33-mall-bot](33-mall-bot/) | 连锁商城：开店克隆门面、总部货源池、购物车下单 | ✅ |
+| 34 | 视频解析下载 | [34-video-download](34-video-download/) | 贴链接选画质解析回传，可替换解析层，50MB 边界 | ✅ |
+| 35 | 语音转文字 | [35-speech-to-text](35-speech-to-text/) | Whisper 兼容转写：私聊即转、群里开关自动转 | ✅ |
+| 36 | 个人提醒/待办 | [36-personal-reminder](36-personal-reminder/) | 自然语言时间提醒+周期提醒+待办清单 | ✅ |
+| 37 | 贴纸制作 | [37-sticker-maker](37-sticker-maker/) | 发图选 emoji 自动建贴纸包，规格处理可外置 | ✅ |
+| 38 | 天气 | [38-weather](38-weather/) | Open-Meteo 免费源：查天气+订阅每日预报 | ✅ |
+| 39 | GitHub 通知 | [39-github-notify](39-github-notify/) | 仓库 Webhook 验签接收，push/PR/Issue 推到聊天 | ✅ |
+| 40 | Inline 工具 | [40-inline-tools](40-inline-tools/) | 任意聊天 @ 出卡片：词库搜索/换算/计算器/时间戳 | 不用 |
 
 
 每个目录里都有自己的 `README.md`（变量清单 + 注意事项）。
@@ -98,7 +125,7 @@
 
 - **Bot Token 只填进 Cloudflare 的 Secret 变量里，不要写进代码、不要发到聊天/群里。** 泄露后去 @BotFather 用 /revoke 重置。
 - `WEBHOOK_SECRET` 随便编一串长随机字符即可，它同时是 `/setWebhook` 的访问口令。
-- 无状态设计：01–05、07、08 不用任何数据库（靠消息转发/按钮里编码的坐标工作）；06、09、10、11、13、14、15、16、17、18、19、21、22、24、25、26、29、30 需要绑定一个 KV（12 仅答题模式、23 仅价格提醒需要，20、27、28 不用）；KV 只存小数据（映射/名单/索引/账本），文件本体都在 Telegram 服务器上。
+- 无状态设计：01–05、07、08 不用任何数据库（靠消息转发/按钮里编码的坐标工作）；06、09、10、11、13、14、15、16、17、18、19、21、22、24、25、26、29、30、31、32、33、34、35、36、37、39 需要绑定一个 KV（12 仅答题模式、23 仅价格提醒、38 仅订阅功能需要，20、27、28、40 不用）；KV 只存小数据（映射/名单/索引/账本），文件本体都在 Telegram 服务器上。
 
 ## 组合玩法
 
