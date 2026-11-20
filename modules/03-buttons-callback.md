@@ -80,5 +80,8 @@ function topView(rows, page) {
 | `quiz:` | 答题 | 26 |
 | `join:` | 接龙报名 | 24 |
 | `check` / `gcheck` | 订阅复检 | 03 / combo-group-guard |
+| `shop:` / `cart:` | 商店导航 / 购物车操作 | 22 |
+| `rem:` | 待办勾选（rem:done:<id>） | 34 |
+| `ai:` | AI 人设/清空类按钮（预留） | 25 |
 
 新拼模块时先查这张表，前缀不撞就能共存；完整拼装规则见 [docs/ASSEMBLY.md](../docs/ASSEMBLY.md)。
