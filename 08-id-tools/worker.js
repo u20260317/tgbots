@@ -10,6 +10,10 @@
 // 部署后访问 https://你的Worker地址/setWebhook?key=你的WEBHOOK_SECRET
 // ============================================================
 
+// ============================================================
+// 【核心模块】Telegram Bot API 通信层
+// 统一封装 tg()：所有给 Telegram 发的请求都走这里，改 API 地址/加重试只改这一处。
+// ============================================================
 async function tg(env, method, payload) {
   const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
@@ -18,6 +22,10 @@ async function tg(env, method, payload) {
 }
 const send = (env, chat_id, text, extra = {}) => tg(env, "sendMessage", { chat_id, text, ...extra });
 
+// ============================================================
+// 【核心模块】转发来源解析
+// 把 forward_origin 翻译成人类可读的用户/频道/群 ID 信息。
+// ============================================================
 function originInfo(m) {
   const o = m.forward_origin;
   if (!o) return null;
@@ -27,6 +35,10 @@ function originInfo(m) {
   if (o.type === "hidden_user") return `🙈 对方隐藏了账号：${o.sender_user_name}（拿不到 ID，可让对方直接私聊 Bot 发 /id）`;
   return null;
 }
+// ============================================================
+// 【核心模块】file_id 提取
+// 识别消息里的文件类型并返回其 file_id。
+// ============================================================
 function fileIdOf(m) {
   if (m.document) return ["document", m.document.file_id];
   if (m.photo?.length) return ["photo", m.photo[m.photo.length - 1].file_id];
@@ -39,6 +51,10 @@ function fileIdOf(m) {
   return null;
 }
 
+// ============================================================
+// 【核心模块】Worker 入口与路由
+// 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
+// ============================================================
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -59,6 +75,10 @@ export default {
   },
 };
 
+// ============================================================
+// 【核心模块】业务主流程
+// ID 解析业务主流程（用户/群/转发来源/file_id 查询）。这是本 Bot 真正干活的地方，其余都是它的地基。
+// ============================================================
 async function handle(env, update) {
   const msg = update.message;
   if (!msg) return;
