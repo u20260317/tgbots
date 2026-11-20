@@ -1,6 +1,6 @@
 # tgbots · Telegram Bot 单文件合集（Cloudflare Workers）
 
-10 个常用 TG Bot，**每个都是一个独立的 `worker.js` 单文件**：复制粘贴（或拖拽）到 Cloudflare Worker 即可部署，零依赖、零服务器、跑在 Workers 免费额度里。一个 Bot 用一个 Worker、一个 Bot Token，互不干扰，各从其类。
+18 个常用 TG Bot，**每个都是一个独立的 `worker.js` 单文件**：复制粘贴（或拖拽）到 Cloudflare Worker 即可部署，零依赖、零服务器、跑在 Workers 免费额度里。一个 Bot 用一个 Worker、一个 Bot Token，互不干扰，各从其类。
 
 ## 目录
 
@@ -16,6 +16,14 @@
 | 08 | ID 查询工具 | [08-id-tools](08-id-tools/) | 查用户/群/频道 ID 和 file_id，配其它 Bot 用 | 否 |
 | 09 | 订阅群发 | [09-broadcast](09-broadcast/) | /start 订阅、管理员 /broadcast 群发通知 | ✅ |
 | 10 | 网盘（私有频道存储） | [10-cloud-drive](10-cloud-drive/) | 文件转存私有频道当硬盘，列表/搜索/标签/分享链接 | ✅ |
+| 11 | RSS/定时推送 | [11-rss-push](11-rss-push/) | Cron 定时抓 RSS 新文章自动推频道，KV 去重 | ✅ |
+| 12 | 入群申请审核 | [12-join-request](12-join-request/) | 加入申请三模式：按钮审核/秒通过/答题审核 | 答题模式需 |
+| 13 | 签到积分/抽奖 | [13-checkin-lottery](13-checkin-lottery/) | 每日签到连签加成、积分榜、按钮报名抽奖 | ✅ |
+| 14 | 付费会员 | [14-paid-membership](14-paid-membership/) | 卖会员：确认收款自动发邀请链接，到期自动踢 | ✅ |
+| 15 | 数字商品售货 | [15-digital-shop](15-digital-shop/) | 卡密/链接自动发货，库存管理，确认后出货 | ✅ |
+| 16 | 邀请引流统计 | [16-referral](16-referral/) | 深链+专属进群链接双归因，邀请榜（合规统计） | ✅ |
+| 17 | 任务赚钱 | [17-task-earn](17-task-earn/) | 发任务攒积分：加入类自动验证，兑换走审核 | ✅ |
+| 18 | 频道导航/互推 | [18-channel-directory](18-channel-directory/) | 频道自助提交审核收录，分类导航/搜索/随机 | ✅ |
 
 每个目录里都有自己的 `README.md`（变量清单 + 注意事项）。
 
@@ -46,7 +54,7 @@
 
 - **Bot Token 只填进 Cloudflare 的 Secret 变量里，不要写进代码、不要发到聊天/群里。** 泄露后去 @BotFather 用 /revoke 重置。
 - `WEBHOOK_SECRET` 随便编一串长随机字符即可，它同时是 `/setWebhook` 的访问口令。
-- 无状态设计：01–05、07、08 不用任何数据库（靠消息转发/按钮里编码的坐标工作）；06、09、10 需要绑定一个 KV（只存极小的映射/名单/目录索引，文件本体都在 Telegram 服务器上）。
+- 无状态设计：01–05、07、08 不用任何数据库（靠消息转发/按钮里编码的坐标工作）；06、09、10、11、13、14、15、16、17、18 需要绑定一个 KV（12 仅答题模式需要）；KV 只存小数据（映射/名单/索引/账本），文件本体都在 Telegram 服务器上。
 
 ## 组合玩法
 
