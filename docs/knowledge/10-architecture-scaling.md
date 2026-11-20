@@ -57,4 +57,5 @@ Worker 是无状态的：每次请求可能落在不同实例，内存里的变�
 
 - 多租户实现：[modules/21 母体 Bot](../../modules/21-mother-bot.md)、[modules/23 商城连锁](../../modules/23-franchise-mall.md)。
 - 拼装方法论：[docs/ASSEMBLY.md](../ASSEMBLY.md)；选型总述：[docs/DESIGN.md](../DESIGN.md)。
-- 存储姿势：[modules/04 KV 状态存储](../../modules/04-kv-store.md)。
+- 存储姿势：[modules/04 KV 状态存储](../../modules/04-kv-store.md)；KV 最终一致性与并发写的深水区（拆键、幂等、何时迁 D1/DO）专文见 [17 KV 最终一致性与并发写](17-kv-consistency.md)。
+- 多租户的成品形态：模板 32（自研母体）与模板 54（官方 Managed Bots 路线）。
