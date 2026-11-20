@@ -39,7 +39,12 @@
 | 15 | 数字商品售货 | 2026-11-20 | L4 | ✅ | 全链读回验证：/addproduct 建 prod:r9a8b → /addstock 库存 1 → buy: 建单 → paid: 待确认 → payok: 后库存变 [] 且订单 status=done、delivered=CARD-001-TEST；注：首次 payok 与 paid 的 KV 写入撞车被状态校验拦下，补发后成功，属测试时序问题 |
 | 16 | 邀请引流统计 | 2026-11-20 | L4 | ✅ | 深链 /start ref_ 后读回 refdone:800000116=800000016、ref:800000016={count:1}；/invite、/topinv 均 200；注：首个更新曾遇传播期 404，复测通过 |
 | 17 | 任务赚钱 | 2026-11-20 | L4 | ✅ | /addtask 建 task 两条；verify: 对不存在频道正确不发分；submit: 生成 claim:，claimok: 后 pts 读回 +50；🐛 发现并修复 bug：claimok 发分时积分档案 name 被重复拼「· ID」（claim 存的已是格式化名又过一次 who()），已存原始 fname/uname 修复，推送 commit 1b8bf6e，复测 name 只出现一次 ID、+30 正确 |
-| 其余 13 个单体 + 3 个组合 | | | | ⏳ | 全量测试进行中，逐个回填本表 |
+| 18 | 频道导航/互推 | 2026-11-20 | L4 | ✅ | /submit @telegram 后 KV 读回 dir:telegram（标题 Telegram News、成员 9085502、status=pending，均为真实 TG 数据），管理员 dirok: 后 status 变 ok；错密钥 403 |
+| 19 | 投票问卷 | 2026-11-20 | L4 | ✅ | /poll 建 poll:vrak，另一用户 vote: 后 KV 读回 votes={800000119:0} 计票正确；错密钥 403 |
+| 20 | 消息推送 API | 2026-11-20 | L4 | ✅ | GET /push 错 key 回 403「key 不对」，对 key 回 502 且 body 带 Telegram 原始错误 chat not found（证明请求已达 TG）；/start、/id 200（首请求 500 与错密钥 404 均为传播期抖动，复测分别 200/403） |
+| 21 | 定时播报 | 2026-11-20 | L4 | ✅ | /add 后 KV jobs 读回任务（09:30 daily、目标群、nextRun 计算正确）；/jobs 200，错密钥 403；Cron 实际发送路径无法 HTTP 触发，以任务落盘+nextRun 验代（见限制说明） |
+| 22 | 群活跃统计 | 2026-11-20 | L4 | ✅ | 群消息后 KV 读回 stats:…:2026-11-20 = {msgs:3, users:{800000022:3}}，计数与实际送达数一致（另 1 条模拟消息遇传播期 404 未达 Worker，不计入属正确）；setWebhook 首次 1042 重试成功 |
+| 其余 8 个单体 + 3 个组合 | | | | ⏳ | 全量测试进行中，逐个回填本表 |
 
 ## 已知测试限制
 - scheduled()（Cron 触发）无法通过 HTTP 直接调用，11/14/21/23 的定时路径用其手动触发口（如 /push、/sweep、/pushnow）或命令路径替代验证，并在备注里注明。
