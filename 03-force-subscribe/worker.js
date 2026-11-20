@@ -25,15 +25,28 @@
 // 统一封装 tg()：所有给 Telegram 发的请求都走这里，改 API 地址/加重试只改这一处。
 // ============================================================
 async function tg(env, method, payload) {
-  const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
-    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
-  });
+  const r = await fetch(
+    `https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    },
+  );
   return r.json().catch(() => ({}));
 }
-const send = (env, chat_id, text, extra = {}) => tg(env, "sendMessage", { chat_id, text, ...extra });
+const send = (env, chat_id, text, extra = {}) =>
+  tg(env, "sendMessage", { chat_id, text, ...extra });
 
-const requiredChats = (env) => String(env.REQUIRED_CHATS || "").split(",").map((s) => s.trim()).filter(Boolean);
-const requiredLinks = (env) => String(env.REQUIRED_LINKS || "").split(",").map((s) => s.trim());
+const requiredChats = (env) =>
+  String(env.REQUIRED_CHATS || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+const requiredLinks = (env) =>
+  String(env.REQUIRED_LINKS || "")
+    .split(",")
+    .map((s) => s.trim());
 
 function linkFor(env, chat, idx) {
   const links = requiredLinks(env);
@@ -50,9 +63,16 @@ function linkFor(env, chat, idx) {
 async function missingSubs(env, userId) {
   const missing = [];
   for (const [i, chat] of requiredChats(env).entries()) {
-    const r = await tg(env, "getChatMember", { chat_id: chat, user_id: userId });
+    const r = await tg(env, "getChatMember", {
+      chat_id: chat,
+      user_id: userId,
+    });
     const st = r?.result?.status;
-    if (!r.ok || !["member", "administrator", "creator", "restricted"].includes(st)) missing.push({ chat, idx: i });
+    if (
+      !r.ok ||
+      !["member", "administrator", "creator", "restricted"].includes(st)
+    )
+      missing.push({ chat, idx: i });
   }
   return missing;
 }
@@ -64,7 +84,9 @@ async function missingSubs(env, userId) {
 function joinKeyboard(env, missing) {
   const rows = missing.map((m) => {
     const link = linkFor(env, m.chat, m.idx);
-    return link ? [{ text: `➕ 加入 ${m.chat}`, url: link }] : [{ text: `请先加入 ${m.chat}`, callback_data: "noop" }];
+    return link
+      ? [{ text: `➕ 加入 ${m.chat}`, url: link }]
+      : [{ text: `请先加入 ${m.chat}`, callback_data: "noop" }];
   });
   rows.push([{ text: "✅ 我已加入，点我验证", callback_data: "check" }]);
   return { inline_keyboard: rows };
@@ -74,19 +96,40 @@ function joinKeyboard(env, missing) {
 // 【核心模块】Worker 入口与路由
 // 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
 // ============================================================
+// ---------- Bot 命令菜单（部署时 /setWebhook 自动注册到输入框菜单） ----------
+const COMMANDS = [{ command: "start", description: "开始使用 / 检查订阅" }];
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    if (!env.BOT_TOKEN) return new Response("BOT_TOKEN 未配置", { status: 500 });
-    if (url.pathname === "/") return new Response("force-subscribe bot is running.", { headers: { "content-type": "text/plain;charset=utf-8" } });
+    if (!env.BOT_TOKEN)
+      return new Response("BOT_TOKEN 未配置", { status: 500 });
+    if (url.pathname === "/")
+      return new Response("force-subscribe bot is running.", {
+        headers: { "content-type": "text/plain;charset=utf-8" },
+      });
     if (url.pathname === "/setWebhook") {
-      if (!env.WEBHOOK_SECRET || url.searchParams.get("key") !== env.WEBHOOK_SECRET) return new Response("forbidden", { status: 403 });
+      if (
+        !env.WEBHOOK_SECRET ||
+        url.searchParams.get("key") !== env.WEBHOOK_SECRET
+      )
+        return new Response("forbidden", { status: 403 });
       const hook = `${url.origin}/webhook`;
-      const r = await tg(env, "setWebhook", { url: hook, secret_token: env.WEBHOOK_SECRET, allowed_updates: ["message", "callback_query"] });
-      return Response.json({ setWebhook: hook, telegram: r });
+      const r = await tg(env, "setWebhook", {
+        url: hook,
+        secret_token: env.WEBHOOK_SECRET,
+        allowed_updates: ["message", "callback_query"],
+      });
+      const cm = await tg(env, "setMyCommands", { commands: COMMANDS });
+      return Response.json({ setWebhook: hook, telegram: r, commands: cm });
     }
-    if (url.pathname !== "/webhook" || request.method !== "POST") return new Response("not found", { status: 404 });
-    if (env.WEBHOOK_SECRET && request.headers.get("x-telegram-bot-api-secret-token") !== env.WEBHOOK_SECRET)
+    if (url.pathname !== "/webhook" || request.method !== "POST")
+      return new Response("not found", { status: 404 });
+    if (
+      env.WEBHOOK_SECRET &&
+      request.headers.get("x-telegram-bot-api-secret-token") !==
+        env.WEBHOOK_SECRET
+    )
       return new Response("forbidden", { status: 403 });
     const update = await request.json().catch(() => ({}));
     ctx.waitUntil(handle(env, update));
@@ -101,12 +144,28 @@ export default {
 async function handle(env, update) {
   const cq = update.callback_query;
   if (cq) {
-    if (cq.data === "noop") return tg(env, "answerCallbackQuery", { callback_query_id: cq.id, text: "请联系管理员获取邀请链接" });
+    if (cq.data === "noop")
+      return tg(env, "answerCallbackQuery", {
+        callback_query_id: cq.id,
+        text: "请联系管理员获取邀请链接",
+      });
     if (cq.data === "check") {
       const missing = await missingSubs(env, cq.from.id);
-      if (missing.length) return tg(env, "answerCallbackQuery", { callback_query_id: cq.id, text: "还没检测到加入：" + missing.map((m) => m.chat).join("、"), show_alert: true });
-      await tg(env, "answerCallbackQuery", { callback_query_id: cq.id, text: "✅ 验证通过" });
-      await tg(env, "editMessageText", { chat_id: cq.message.chat.id, message_id: cq.message.message_id, text: unlockedText(env) });
+      if (missing.length)
+        return tg(env, "answerCallbackQuery", {
+          callback_query_id: cq.id,
+          text: "还没检测到加入：" + missing.map((m) => m.chat).join("、"),
+          show_alert: true,
+        });
+      await tg(env, "answerCallbackQuery", {
+        callback_query_id: cq.id,
+        text: "✅ 验证通过",
+      });
+      await tg(env, "editMessageText", {
+        chat_id: cq.message.chat.id,
+        message_id: cq.message.message_id,
+        text: unlockedText(env),
+      });
     }
     return;
   }
@@ -116,16 +175,31 @@ async function handle(env, update) {
 
   // ---- 群内守卫 ----
   if (msg.chat.type === "group" || msg.chat.type === "supergroup") {
-    if (env.GUARD_GROUP_ID && String(msg.chat.id) !== String(env.GUARD_GROUP_ID)) return;
+    if (
+      env.GUARD_GROUP_ID &&
+      String(msg.chat.id) !== String(env.GUARD_GROUP_ID)
+    )
+      return;
     if (!msg.from || msg.from.is_bot) return;
     // 管理员豁免
-    const me = await tg(env, "getChatMember", { chat_id: msg.chat.id, user_id: msg.from.id });
+    const me = await tg(env, "getChatMember", {
+      chat_id: msg.chat.id,
+      user_id: msg.from.id,
+    });
     if (["administrator", "creator"].includes(me?.result?.status)) return;
     const missing = await missingSubs(env, msg.from.id);
     if (!missing.length) return;
-    await tg(env, "deleteMessage", { chat_id: msg.chat.id, message_id: msg.message_id });
+    await tg(env, "deleteMessage", {
+      chat_id: msg.chat.id,
+      message_id: msg.message_id,
+    });
     const kb = joinKeyboard(env, missing);
-    await send(env, msg.chat.id, `⚠️ ${msg.from.first_name || "你好"}，先加入 ${missing.map((m) => m.chat).join("、")} 才能在本群发言，你刚才的消息已删除。`, { reply_markup: kb });
+    await send(
+      env,
+      msg.chat.id,
+      `⚠️ ${msg.from.first_name || "你好"}，先加入 ${missing.map((m) => m.chat).join("、")} 才能在本群发言，你刚才的消息已删除。`,
+      { reply_markup: kb },
+    );
     return;
   }
 
@@ -133,10 +207,18 @@ async function handle(env, update) {
   if (msg.chat.type !== "private") return;
   const missing = await missingSubs(env, msg.from.id);
   if (missing.length)
-    return send(env, msg.chat.id, "🔒 使用本 Bot 前，请先加入下面全部频道/群组，加入后点「✅ 我已加入」验证：", { reply_markup: joinKeyboard(env, missing) });
+    return send(
+      env,
+      msg.chat.id,
+      "🔒 使用本 Bot 前，请先加入下面全部频道/群组，加入后点「✅ 我已加入」验证：",
+      { reply_markup: joinKeyboard(env, missing) },
+    );
   return send(env, msg.chat.id, unlockedText(env));
 }
 
 function unlockedText(env) {
-  return env.UNLOCK_TEXT || "🎉 已验证订阅，欢迎使用！\n（把这里换成你的资源链接/内容说明：在 Worker 变量里设置 UNLOCK_TEXT）";
+  return (
+    env.UNLOCK_TEXT ||
+    "🎉 已验证订阅，欢迎使用！\n（把这里换成你的资源链接/内容说明：在 Worker 变量里设置 UNLOCK_TEXT）"
+  );
 }
