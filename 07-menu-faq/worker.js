@@ -9,6 +9,10 @@
 // ============================================================
 
 // ==================== 在这里改内容 ====================
+// ============================================================
+// 【核心模块】配置数据（本 Bot 的核心内容区）
+// 菜单页面、按钮、关键词全在这里定义；改内容只改这里，不用动下面逻辑。
+// ============================================================
 const CONFIG = {
   homePage: "home",
   pages: {
@@ -33,6 +37,10 @@ const CONFIG = {
 };
 // ==================== 内容区结束 ====================
 
+// ============================================================
+// 【核心模块】Telegram Bot API 通信层
+// 统一封装 tg()：所有给 Telegram 发的请求都走这里，改 API 地址/加重试只改这一处。
+// ============================================================
 async function tg(env, method, payload) {
   const r = await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/${method}`, {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload),
@@ -41,6 +49,10 @@ async function tg(env, method, payload) {
 }
 const send = (env, chat_id, text, extra = {}) => tg(env, "sendMessage", { chat_id, text, ...extra });
 
+// ============================================================
+// 【核心模块】菜单渲染
+// 把 CONFIG 里的页面定义渲染成 inline 键盘并负责翻页编辑。
+// ============================================================
 function keyboard(pageId) {
   const p = CONFIG.pages[pageId];
   if (!p?.buttons?.length) return undefined;
@@ -55,6 +67,10 @@ const showPage = (env, chatId, pageId, editMsgId) => {
   return editMsgId ? tg(env, "editMessageText", { ...payload, message_id: editMsgId }) : tg(env, "sendMessage", payload);
 };
 
+// ============================================================
+// 【核心模块】Worker 入口与路由
+// 处理健康检查、/setWebhook 一键挂载、Webhook 密钥校验，并把更新分发给业务主流程。
+// ============================================================
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -75,6 +91,10 @@ export default {
   },
 };
 
+// ============================================================
+// 【核心模块】业务主流程
+// 菜单与自动回复业务主流程（菜单翻页、关键词匹配）。这是本 Bot 真正干活的地方，其余都是它的地基。
+// ============================================================
 async function handle(env, update) {
   const cq = update.callback_query;
   if (cq) {
